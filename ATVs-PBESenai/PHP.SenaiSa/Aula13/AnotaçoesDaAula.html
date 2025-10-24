@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Caderno de Consulta - CRUD em PHP</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #2e2e2e;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: rgb(153, 153, 153);
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            border-bottom: 2px solid #4a6ee0;
+            padding-bottom: 20px;
+        }
+        
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        h2 {
+            color: #000000;
+            margin: 30px 0 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #ffffff;
+        }
+        
+        h3 {
+            color: #272727;
+            margin: 20px 0 10px;
+        }
+        
+        .card {
+            background-color: #dddddd;
+            border-left: 4px solid #4a6ee0;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 0 5px 5px 0;
+        }
+        
+        .code-block {
+            background-color: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+        
+        .inline-code {
+            background-color: #2d2d2d;
+            color: #f8f8f2;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+        
+        .file-name {
+            background-color: #4a6ee0;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            display: inline-block;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        
+        .comment {
+            color: #7ec699;
+        }
+        
+        .keyword {
+            color: #cc99cd;
+        }
+        
+        .function {
+            color: #f08d49;
+        }
+        
+        .string {
+            color: #7ec699;
+        }
+        
+        .variable {
+            color: #f8c555;
+        }
+        
+        .crud-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        
+        .crud-item {
+            background-color: #f0f7ff;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .crud-item h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .crud-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            color: #4a6ee0;
+        }
+        
+        .file-structure {
+            background-color: #e8f4f8;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        
+        .file-structure ul {
+            list-style-type: none;
+            padding-left: 20px;
+        }
+        
+        .file-structure li {
+            margin: 8px 0;
+            position: relative;
+        }
+        
+        .file-structure li:before {
+            content: "📄";
+            margin-right: 8px;
+        }
+        
+        .persistence-section {
+            background-color: #e8f6f3;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 25px 0;
+            border-left: 4px solid #1abc9c;
+        }
+        
+        .persistence-section h1 {
+            color: #16a085;
+        }
+        
+        .persistence-section h2 {
+            color: #1abc9c;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            color: #7f8c8d;
+        }
+        
+        @media (max-width: 768px) {
+            .crud-section {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Caderno de Consulta - CRUD em PHP</h1>
+            <p>Explicação completa do sistema CRUD usando os arquivos fornecidos como exemplo</p>
+        </header>
+        
+        <section>
+            <h2>O que é CRUD?</h2>
+            <p>CRUD é um acrônimo para as quatro operações básicas do armazenamento persistente:</p>
+            
+            <div class="crud-section">
+                <div class="crud-item">
+                    <div class="crud-icon">➕</div>
+                    <h3>CREATE</h3>
+                    <p>Criar novos registros</p>
+                </div>
+                <div class="crud-item">
+                    <div class="crud-icon">👁️</div>
+                    <h3>READ</h3>
+                    <p>Ler/consultar registros</p>
+                </div>
+                <div class="crud-item">
+                    <div class="crud-icon">✏️</div>
+                    <h3>UPDATE</h3>
+                    <p>Atualizar registros existentes</p>
+                </div>
+                <div class="crud-item">
+                    <div class="crud-icon">🗑️</div>
+                    <h3>DELETE</h3>
+                    <p>Excluir registros</p>
+                </div>
+            </div>
+        </section>
+        
+        <section class="persistence-section">
+            <h1>Persistência de Dados</h1>
+            <p><strong>Array Associativo:</strong> É uma array aonde se associa uma chave a um valor, aonde as chaves assumem o papel de índices do array.</p>
+            <p>Exemplo:</p>
+            <div class="code-block">
+                <code><span class="variable">$alunos</span>[<span class="string">"nome"</span>] = <span class="string">"Gabrielson"</span>;</code>
+            </div>
+            <p>Neste exemplo o valor "Gabrielson" está associado à chave "nome".</p>
+            <p>Isso é feito para melhorar o entendimento do código e n execução e manipulação do array. Caso fossemos trabalhar com um array convencional, teriamos que lembrar qual o índice que iria corresponder à chave "nome".</p>
+            
+            <h2>Na <strong>Aula 13</strong> será feito o mesmo código CRUD da aula 12, porem, aplicando o conceito de Persistência de Dados, dessa forma realizando atualização no código anteriormente feito.</h2>
+        </section>
+        
+        <section>
+            <h2>Estrutura do Projeto</h2>
+            <div class="file-structure">
+                <ul>
+                    <li><strong>CRUD.php</strong> - Define a classe Aluno (Model)</li>
+                    <li><strong>AlunoDAO.php</strong> - Implementa as operações CRUD (Data Access Object)</li>
+                    <li><strong>index.php</strong> - Script principal que utiliza as classes</li>
+                    <li><strong>alunos.json</strong> - Arquivo de armazenamento dos dados</li>
+                </ul>
+            </div>
+        </section>
+        
+        <section>
+            <h2>Explicação dos Arquivos</h2>
+            
+            <h3>1. CRUD.php - Classe Aluno (Model)</h3>
+            <p>Esta classe representa a entidade "Aluno" no sistema, contendo seus atributos e métodos de acesso.</p>
+            
+            <div class="card">
+                <p><strong>Propósito:</strong> Modelar os dados de um aluno com encapsulamento.</p>
+                <p><strong>Atributos:</strong> id, nome, curso (todos privados para proteção dos dados).</p>
+                <p><strong>Métodos:</strong> Construtor, getters e setters para cada atributo.</p>
+            </div>
+            
+            <div class="file-name">CRUD.php</div>
+            <div class="code-block">
+                <pre><code><span class="keyword">&lt;?php</span> 
+
+<span class="keyword">class</span> <span class="function">aluno</span> {
+    <span class="keyword">private</span> <span class="variable">$id</span>;     <span class="comment">// Atributo privado para armazenar o ID do aluno</span>
+    <span class="keyword">private</span> <span class="variable">$nome</span>;   <span class="comment">// Atributo privado para armazenar o nome do aluno</span>
+    <span class="keyword">private</span> <span class="variable">$curso</span>;  <span class="comment">// Atributo privado para armazenar o curso do aluno</span>
+
+    <span class="comment">// Construtor: inicializa o objeto com os valores fornecidos</span>
+    <span class="keyword">public</span> <span class="keyword">function</span> <span class="function">__construct</span>(<span class="variable">$id</span>, <span class="variable">$nome</span>, <span class="variable">$curso</span>) {
+        <span class="variable">$this</span>-&gt; id = <span class="variable">$id</span>;
+        <span class="variable">$this</span>-&gt; nome = <span class="variable">$nome</span>;
+        <span class="variable">$this</span>-&gt;curso = <span class="variable">$curso</span>;
+    }
+
+    <span class="comment">// SETTERS: métodos para modificar os valores dos atributos</span>
+    <span class="keyword">public</span> <span class="keyword">function</span> <span class="function">setId</span>(<span class="variable">$id</span>) { 
+        <span class="variable">$this</span>-&gt;id=<span class="variable">$id</span>;
+    }
+
+    <span class="keyword">public</span> <span class="keyword">function</span> <span class="function">setNome</span>(<span class="variable">$nome</span>) {
+        <span class="variable">$this</span>-&gt;nome=<span class="variable">$nome</span>;
+    }
+
+    <span class="keyword">public</span> <span class="keyword">function</span> <span class="function">setCurso</span>(<span class="variable">$curso</span>) {
+        <span class="variable">$this</span>-&gt;curso=<span class="variable">$curso</span>;
+    }
+
+    <span class="comment">// GETTERS: métodos para acessar os valores dos atributos</span>
+    <span class="keyword">public</span> <span class="keyword">function</span> <span class="function">getId</span>() {
+        <span class="keyword">return</span> <span class="variable">$this</span>-&gt;id;
+    }
+
+    <span class="keyword">public</span> <span class="keyword">function</span> <span class="function">getNome</span>() {
+        <span class="keyword">return</span> <span class="variable">$this</span>-&gt;nome;
+    }
+
+    <span class="keyword">public</span> <span class="keyword">function</span> <span class="function">getCurso</span>() {
+        <span class="keyword">return</span> <span class="variable">$this</span>-&gt;curso;
+    }
+}
+
+<span class="keyword">?&gt;</span></code></pre>
+            </div>
+            
+            <h3>2. AlunoDAO.php - Data Access Object</h3>
+            <p>Esta classe é responsável por todas as operações de persistência de dados (CRUD).</p>
+            
+            <div class="card">
+                <p><strong>Propósito:</strong> Separar a lógica de acesso a dados da lógica de negócio.</p>
+                <p><strong>Funcionalidades:</strong> Criar, ler, atualizar e excluir alunos, além de persistir os dados em arquivo JSON.</p>
+            </div>
+            
+            <div class="file-name">AlunoDAO.php</div>
+            <div class="code-block">
+                <pre><code><span class="keyword">&lt;?php</span>
+
+<span class="keyword">require_once</span> <span class="string">'CRUD.php'</span>; <span class="comment">// Importa a classe Aluno para uso</span>
+
+<span class="keyword">class</span> <span class="function">AlunoDAO</span> { <span class="comment">// DAO = "Data Access Object" - Padrão de projeto para acesso a dados</span>
+
+    <span class="keyword">private</span> <span class="variable">$alunos</span> = []; <span class="comment">// Array para armazenar temporariamente os objetos Aluno</span>
+    <span class="keyword">private</span> <span class="variable">$arquivo</span> = <span class="string">"alunos.json"</span>; <span class="comment">// Nome do arquivo para persistência</span>
+
+    <span class="comment">// Construtor: carrega os dados do arquivo JSON ao iniciar a aplicação</span>
+    <span class="keyword">public</span> <span class="keyword">function</span> <span class="function">__construct</span>() { 
+        <span class="keyword">if</span> (file_exists(<span class="variable">$this</span>-&gt;arquivo)) {
+            <span class="variable">$conteudo</span> = file_get_contents(<span class="variable">$this</span>-&gt;arquivo);  
+            <span class="variable">$dados</span> = json_decode(<span class="variable">$conteudo</span>, <span class="keyword">true</span>); <span class="comment">// Converte JSON em array associativo</span>
+
+            <span class="keyword">if</span> (<span class="variable">$dados</span>) {
+                <span class="keyword">foreach</span> (<span class="variable">$dados</span> <span class="keyword">as</span> <span class="variable">$id</span> =&gt; <span class="variable">$info</span>) {
+                    <span class="variable">$this</span>-&gt;alunos[<span class="variable">$id</span>] = <span class="keyword">new</span> Aluno(
+                        <span class="variable">$info</span>[<span class="string">'id'</span>],
+                        <span class="variable">$info</span>[<span class="string">'nome'</span>],
+                        <span class="variable">$info</span>[<span class="string">'curso'</span>]
+                    );
+                }
+            }
+        }
+    }
+
+    <span class="comment">// Função privada para salvar os dados no arquivo JSON</span>
+    <span class="keyword">private</span> <span class="keyword">function</span> <span class="function">salvarEmArquivo</span>() {
+        <span class="variable">$dados</span> = [];
+
+        <span class="keyword">foreach</span> (<span class="variable">$this</span>-&gt;alunos <span class="keyword">as</span> <span class="variable">$id</span> =&gt; <span class="variable">$aluno</span>) {
+            <span class="variable">$dados</span>[<span class="variable">$id</span>] = [
+                <span class="string">'id'</span> =&gt; <span class="variable">$aluno</span>-&gt;getId(),
+                <span class="string">'nome'</span> =&gt; <span class="variable">$aluno</span>-&gt;getNome(),
+                <span class="string">'curso'</span> =&gt; <span class="variable">$aluno</span>-&gt;getCurso()
+            ];
+        }
+
+        file_put_contents(<span class="variable">$this</span>-&gt;arquivo, json_encode(<span class="variable">$dados</span>, JSON_PRETTY_PRINT));
+    }
+
+    <span class="comment">// CREATE: Adiciona um novo aluno ao sistema</span>
+    <span class="keyword">public</span> <span class="keyword">function</span> <span class="function">criarAluno</span>(Aluno <span class="variable">$aluno</span>) {
+        <span class="variable">$this</span>-&gt;alunos[<span class="variable">$aluno</span>-&gt;getId()] = <span class="variable">$aluno</span>;
+        <span class="variable">$this</span>-&gt;salvarEmArquivo(); <span class="comment">// Persiste a alteração no arquivo</span>
+    }
+
+    <span class="comment">// READ: Retorna todos os alunos</span>
+    <span class="keyword">public</span> <span class="keyword">function</span> <span class="function">lerAluno</span>() {
+        <span class="keyword">return</span> <span class="variable">$this</span>-&gt;alunos;
+    }
+
+    <span class="comment">// UPDATE: Atualiza os dados de um aluno existente</span>
+    <span class="keyword">public</span> <span class="keyword">function</span> <span class="function">atualizarAluno</span>(<span class="variable">$id</span>, <span class="variable">$novoNome</span>, <span class="variable">$novoCurso</span>) {
+        <span class="keyword">if</span> (isset(<span class="variable">$this</span>-&gt;alunos[<span class="variable">$id</span>])) {
+            <span class="variable">$this</span>-&gt;alunos[<span class="variable">$id</span>]-&gt;setNome(<span class="variable">$novoNome</span>);
+            <span class="variable">$this</span>-&gt;alunos[<span class="variable">$id</span>]-&gt;setCurso(<span class="variable">$novoCurso</span>);
+            <span class="variable">$this</span>-&gt;salvarEmArquivo(); <span class="comment">// Persiste a alteração no arquivo</span>
+        }
+    }
+
+    <span class="comment">// DELETE: Remove um aluno do sistema</span>
+    <span class="keyword">public</span> <span class="keyword">function</span> <span class="function">excluirAluno</span>(<span class="variable">$id</span>) {
+        <span class="keyword">if</span> (isset(<span class="variable">$this</span>-&gt;alunos[<span class="variable">$id</span>])) {
+            unset(<span class="variable">$this</span>-&gt;alunos[<span class="variable">$id</span>]);
+            <span class="variable">$this</span>-&gt;salvarEmArquivo(); <span class="comment">// Persiste a alteração no arquivo</span>
+        }
+    }
+}
+
+<span class="keyword">?&gt;</span></code></pre>
+            </div>
+            
+            <h3>3. index.php - Script Principal</h3>
+            <p>Este arquivo demonstra o uso das classes Aluno e AlunoDAO, executando todas as operações CRUD.</p>
+            
+            <div class="file-name">index.php</div>
+            <div class="code-block">
+                <pre><code><span class="keyword">&lt;?php</span> 
+        <span class="keyword">require_once</span> <span class="string">"CRUD.php"</span>;
+        <span class="keyword">require_once</span> <span class="string">"AlunoDAO.php"</span>;
+    
+    <span class="comment">// Cria objeto da classe AlunoDAO para operações CRUD</span>
+    <span class="variable">$dao</span> = <span class="keyword">new</span> AlunoDAO();
+
+    <span class="comment">// CREATE: Adiciona alunos ao sistema</span>
+    <span class="variable">$dao</span> -&gt; criarAluno( <span class="keyword">new</span> Aluno(1, <span class="string">"Eduardo"</span>, <span class="string">"TADS"</span>));
+    <span class="variable">$dao</span> -&gt; criarAluno( <span class="keyword">new</span> Aluno(2, <span class="string">"Marcelo"</span>, <span class="string">"Medicina"</span>));
+    <span class="variable">$dao</span> -&gt; criarAluno( <span class="keyword">new</span> Aluno(3, <span class="string">"Gabriel"</span>, <span class="string">"Engenharia"</span>));
+
+    <span class="comment">// Adiciona mais 6 alunos conforme solicitado</span>
+    <span class="variable">$dao</span> -&gt; criarAluno( <span class="keyword">new</span> Aluno(4, <span class="string">"Aurora"</span>, <span class="string">"Arquitetura"</span>));
+    <span class="variable">$dao</span> -&gt; criarAluno( <span class="keyword">new</span> Aluno(5, <span class="string">"Oliver"</span>, <span class="string">"Director"</span>));
+    <span class="variable">$dao</span> -&gt; criarAluno( <span class="keyword">new</span> Aluno(6, <span class="string">"Amanda"</span>, <span class="string">"Lutadora"</span>));
+    <span class="variable">$dao</span> -&gt; criarAluno( <span class="keyword">new</span> Aluno(7, <span class="string">"Gleyse"</span>, <span class="string">"Engenharia"</span>));
+    <span class="variable">$dao</span> -&gt; criarAluno( <span class="keyword">new</span> Aluno(8, <span class="string">"Jao"</span>, <span class="string">"Professor"</span>));
+    <span class="variable">$dao</span> -&gt; criarAluno( <span class="keyword">new</span> Aluno(9, <span class="string">"Bernardo"</span>, <span class="string">"Streamer"</span>));
+
+    <span class="comment">// READ: Exibe todos os alunos cadastrados</span>
+    <span class="keyword">echo</span> <span class="string">"Listagem inicial:\n   "</span>;
+    <span class="keyword">foreach</span>(<span class="variable">$dao</span> -&gt; lerAluno() <span class="keyword">as</span> <span class="variable">$aluno</span>){
+        <span class="keyword">echo</span> <span class="string">"{</span><span class="variable">$aluno</span><span class="string"> -&gt; getId()} - {</span><span class="variable">$aluno</span><span class="string"> -&gt; getNome()} - {</span><span class="variable">$aluno</span><span class="string"> -&gt; getCurso()}\n"</span>;
+    }
+
+    <span class="comment">// UPDATE: Atualiza dados de alunos existentes</span>
+    <span class="variable">$dao</span> -&gt; atualizarAluno(1, <span class="string">"Mariana"</span>, <span class="string">"Design"</span>);
+    
+    <span class="comment">// Atualizações solicitadas:</span>
+    <span class="variable">$dao</span> -&gt; atualizarAluno(7, <span class="string">"Clotilde"</span>, <span class="string">"Engenharia"</span>); <span class="comment">// Alterar nome da Gleyse para Clotilde</span>
+    <span class="variable">$dao</span> -&gt; atualizarAluno(8, <span class="string">"Joana"</span>, <span class="string">"Professor"</span>);    <span class="comment">// Alterar nome do Jao para Joana</span>
+    <span class="variable">$dao</span> -&gt; atualizarAluno(9, <span class="string">"Bernardo"</span>, <span class="string">"Dev"</span>);      <span class="comment">// Alterar curso do Bernardo para Dev</span>
+    <span class="variable">$dao</span> -&gt; atualizarAluno(6, <span class="string">"Amanda"</span>, <span class="string">"Logistica"</span>); <span class="comment">// Alterar curso da Amanda para Logistica</span>
+    <span class="variable">$dao</span> -&gt; atualizarAluno(5, <span class="string">"Oliver"</span>, <span class="string">"Eletria"</span>);    <span class="comment">// Alterar curso do Oliver para Eletria</span>
+
+    <span class="comment">// Exibe a lista após as atualizações</span>
+    <span class="keyword">echo</span> <span class="string">"\nListagem após atualização:\n"</span>;
+    <span class="keyword">foreach</span>(<span class="variable">$dao</span> -&gt; lerAluno() <span class="keyword">as</span> <span class="variable">$aluno</span>){
+        <span class="keyword">echo</span> <span class="string">"{</span><span class="variable">$aluno</span><span class="string"> -&gt; getId()} - {</span><span class="variable">$aluno</span><span class="string"> -&gt; getNome()} - {</span><span class="variable">$aluno</span><span class="string"> -&gt; getCurso()}\n"</span>;
+    }
+
+    <span class="comment">// DELETE: Remove um aluno do sistema</span>
+    <span class="variable">$dao</span> -&gt; excluirAluno(2); <span class="comment">// Remove o aluno com ID 2 (Marcelo)</span>
+
+    <span class="comment">// Exibe a lista após a exclusão</span>
+    <span class="keyword">echo</span> <span class="string">"\nListagem após exclusão:\n"</span>;
+    <span class="keyword">foreach</span>(<span class="variable">$dao</span> -&gt; lerAluno() <span class="keyword">as</span> <span class="variable">$aluno</span>){
+        <span class="keyword">echo</span> <span class="string">"{</span><span class="variable">$aluno</span><span class="string"> -&gt; getId()} - {</span><span class="variable">$aluno</span><span class="string"> -&gt; getNome()} - {</span><span class="variable">$aluno</span><span class="string"> -&gt; getCurso()}\n"</span>;
+    }</code></pre>
+            </div>
+            
+            <h3>4. alunos.json - Armazenamento de Dados</h3>
+            <p>Este arquivo é gerado automaticamente pelo sistema e contém os dados dos alunos em formato JSON.</p>
+            
+            <div class="card">
+                <p><strong>Propósito:</strong> Persistir os dados entre execuções do script.</p>
+                <p><strong>Formato:</strong> JSON com estrutura de dicionário onde as chaves são os IDs dos alunos.</p>
+            </div>
+            
+            <div class="file-name">alunos.json</div>
+            <div class="code-block">
+                <pre><code>{
+    <span class="string">"1"</span>: {
+        <span class="string">"id"</span>: 1,
+        <span class="string">"nome"</span>: <span class="string">"Mariana"</span>,
+        <span class="string">"curso"</span>: <span class="string">"Design"</span>
+    },
+    <span class="string">"3"</span>: {
+        <span class="string">"id"</span>: 3,
+        <span class="string">"nome"</span>: <span class="string">"Gabriel"</span>,
+        <span class="string">"curso"</span>: <span class="string">"Engenharia"</span>
+    },
+    <span class="comment">// ... demais registros</span>
+}</code></pre>
+            </div>
+        </section>
+        
+        <section>
+            <h2>Conceitos Importantes</h2>
+            
+            <h3>Encapsulamento</h3>
+            <p>Os atributos da classe Aluno são privados, protegendo o acesso direto aos dados. O acesso é feito apenas através dos métodos getters e setters.</p>
+            
+            <h3>Separação de Responsabilidades</h3>
+            <p>O sistema está dividido em:</p>
+            <ul>
+                <li><strong>Model (Aluno):</strong> Representa os dados</li>
+                <li><strong>DAO (AlunoDAO):</strong> Gerencia o acesso aos dados</li>
+                <li><strong>Controller (index.php):</strong> Orquestra as operações</li>
+            </ul>
+            
+            <h3>Persistência</h3>
+            <p>Os dados são salvos em arquivo JSON, permitindo que as informações sejam mantidas entre execuções do script.</p>
+            
+            <h3>Padrão DAO (Data Access Object)</h3>
+            <p>Este padrão isola a lógica de acesso a dados do restante da aplicação, facilitando a manutenção e possíveis mudanças no sistema de armazenamento.</p>
+            
+            <h3>Arrays Associativos</h3>
+            <p>No exemplo <code class="inline-code">$alunos["nome"] = "Gabrielson"</code>, temos um array associativo onde:</p>
+            <ul>
+                <li><code class="inline-code">"nome"</code> é a chave (substitui o índice numérico)</li>
+                <li><code class="inline-code">"Gabrielson"</code> é o valor associado à chave</li>
+            </ul>
+            <p>Isso torna o código mais legível e fácil de manter, pois não precisamos lembrar que "nome" está no índice 0, "curso" no índice 1, etc.</p>
+        </section>
+        
+        <footer>
+            <p>Caderno de Consulta - CRUD em PHP | Desenvolvido para fins educacionais</p>
+        </footer>
+    </div>
+</body>
+</html>
