@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Caderno de Estudos PHP - Relacionamento entre Classes</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --association-color: #e74c3c;
+            --aggregation-color: #f39c12;
+            --composition-color: #27ae60;
+            --advanced-color: #9b59b6;
+            --light-color: #ecf0f1;
+            --dark-color: #2c3e50;
+            --code-bg: #282c34;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: var(--dark-color);
+            line-height: 1.6;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .nav-tabs {
+            background: white;
+            padding: 1rem 2rem;
+            display: flex;
+            gap: 1rem;
+            overflow-x: auto;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .nav-tab {
+            padding: 0.75rem 1.5rem;
+            background: #f8f9fa;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            font-weight: 500;
+        }
+        
+        .nav-tab.active {
+            background: var(--secondary-color);
+            color: white;
+        }
+        
+        .nav-tab:hover {
+            transform: translateY(-2px);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .study-section {
+            display: none;
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        .study-section.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .intro {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            margin-bottom: 2rem;
+            border-left: 5px solid var(--secondary-color);
+        }
+        
+        .relationship-section {
+            background-color: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            margin-bottom: 3rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .relationship-section:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .section-header {
+            padding: 1.5rem;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .association .section-header { background-color: var(--association-color); }
+        .aggregation .section-header { background-color: var(--aggregation-color); }
+        .composition .section-header { background-color: var(--composition-color); }
+        .advanced .section-header { background-color: var(--advanced-color); }
+        
+        .section-body {
+            padding: 2rem;
+        }
+        
+        .explanation {
+            margin-bottom: 2rem;
+        }
+        
+        .example {
+            background-color: #f8f9fa;
+            border-left: 4px solid var(--secondary-color);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 0 4px 4px 0;
+        }
+        
+        .code-section {
+            background-color: var(--code-bg);
+            border-radius: 8px;
+            overflow: hidden;
+            margin: 1.5rem 0;
+        }
+        
+        .code-header {
+            background-color: rgba(0, 0, 0, 0.2);
+            padding: 0.75rem 1rem;
+            color: #abb2bf;
+            font-size: 0.9rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .code-body {
+            padding: 1rem;
+        }
+        
+        .code-body pre {
+            margin: 0;
+        }
+        
+        .practice-exercise {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 10px;
+            margin: 2rem 0;
+        }
+        
+        .exercise-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .visualization {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            margin-bottom: 2rem;
+        }
+        
+        .comparison {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        th {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .tips {
+            background-color: #e8f4fd;
+            border-left: 4px solid var(--secondary-color);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 0 4px 4px 0;
+        }
+        
+        .warning {
+            background-color: #fde8e8;
+            border-left: 4px solid var(--association-color);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 0 4px 4px 0;
+        }
+        
+        footer {
+            background-color: var(--dark-color);
+            color: white;
+            text-align: center;
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+        
+        .complex-example {
+            background-color: #fff3cd;
+            border-left: 4px solid var(--aggregation-color);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 0 4px 4px 0;
+        }
+        
+        @media (max-width: 768px) {
+            .nav-tabs {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>📚 Caderno de Estudos PHP</h1>
+        <p>Relacionamento entre Classes - Guia Completo</p>
+    </header>
+    
+    <nav class="nav-tabs">
+        <button class="nav-tab active" data-tab="basics">Fundamentos</button>
+        <button class="nav-tab" data-tab="association">Associação</button>
+        <button class="nav-tab" data-tab="aggregation">Agregação</button>
+        <button class="nav-tab" data-tab="composition">Composição</button>
+        <button class="nav-tab" data-tab="advanced">Avançado</button>
+        <button class="nav-tab" data-tab="exercises">Exercícios</button>
+    </nav>
+    
+    <div class="container">
+        <!-- SEÇÃO: FUNDAMENTOS -->
+        <section id="basics" class="study-section active">
+            <div class="intro">
+                <h2>🎯 Fundamentos de OOP em PHP</h2>
+                <p>Programação Orientada a Objetos (OOP) é um paradigma que organiza o código em "objetos" que representam entidades do mundo real.</p>
+            </div>
+            
+            <div class="relationship-section">
+                <div class="section-header">
+                    <h3>📖 Conceitos Básicos</h3>
+                </div>
+                <div class="section-body">
+                    <div class="explanation">
+                        <h4>O que são Classes e Objetos?</h4>
+                        <p><strong>Classe:</strong> Molde/blueprint que define atributos e métodos</p>
+                        <p><strong>Objeto:</strong> Instância concreta de uma classe</p>
+                    </div>
+                    
+                    <div class="code-section">
+                        <div class="code-header">
+                            <span>Exemplo Básico de Classe em PHP</span>
+                        </div>
+                        <div class="code-body">
+                            <pre><code class="php">&lt;?php
+// DEFINIÇÃO DA CLASE
+class Carro {
+    // ATRIBUTOS (propriedades)
+    public $marca;
+    public $modelo;
+    private $ano;
+    
+    // MÉTODO CONSTRUTOR
+    public function __construct($marca, $modelo, $ano) {
+        $this->marca = $marca;
+        $this->modelo = $modelo;
+        $this->ano = $ano;
+    }
+    
+    // MÉTODOS (comportamentos)
+    public function ligar() {
+        return "{$this->marca} {$this->modelo} está ligado!";
+    }
+    
+    public function getAno() {
+        return $this->ano;
+    }
+}
+
+// CRIANDO OBJETOS (instâncias)
+$meuCarro = new Carro("Toyota", "Corolla", 2022);
+$outroCarro = new Carro("Honda", "Civic", 2023);
+
+// USANDO OS OBJETOS
+echo $meuCarro->ligar(); // Toyota Corolla está ligado!
+echo $outroCarro->getAno(); // 2023
+?&gt;</code></pre>
+                        </div>
+                    </div>
+                    
+                    <div class="tips">
+                        <h4>💡 Dicas Importantes:</h4>
+                        <ul>
+                            <li>Use <code>public</code> para atributos/métodos acessíveis de qualquer lugar</li>
+                            <li>Use <code>private</code> para restringir acesso apenas à própria classe</li>
+                            <li>Use <code>protected</code> para acesso na classe e classes filhas</li>
+                            <li>Sempre inicie nomes de classes com letra maiúscula</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SEÇÃO: ASSOCIAÇÃO -->
+        <section id="association" class="study-section">
+            <div class="intro">
+                <h2>🤝 Associação entre Classes</h2>
+                <p>Relação onde objetos de diferentes classes podem interagir, mas mantêm independência.</p>
+            </div>
+            
+            <div class="relationship-section association">
+                <div class="section-header">
+                    <h3>Associação Básica</h3>
+                </div>
+                <div class="section-body">
+                    <div class="explanation">
+                        <p><strong>Características:</strong></p>
+                        <ul>
+                            <li>Classes existem independentemente</li>
+                            <li>Relação temporária ou de uso</li>
+                            <li>Objetos podem se conectar e desconectar</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="example">
+                        <p><strong>Exemplo Prático:</strong> <em>Aluno</em> e <em>Curso</em></p>
+                        <p>Um aluno pode se matricular em vários cursos, e os cursos existem independentemente dos alunos.</p>
+                    </div>
+                    
+                    <div class="code-section">
+                        <div class="code-header">
+                            <span>Implementação de Associação em PHP</span>
+                        </div>
+                        <div class="code-body">
+                            <pre><code class="php">&lt;?php
+class Aluno {
+    public $nome;
+    private $cursos = []; // Associação com múltiplos cursos
+    
+    public function __construct($nome) {
+        $this->nome = $nome;
+    }
+    
+    // ASSOCIAÇÃO: Aluno pode se matricular em cursos
+    public function matricular($curso) {
+        $this->cursos[] = $curso;
+        $curso->adicionarAluno($this);
+    }
+    
+    public function listarCursos() {
+        return $this->cursos;
+    }
+}
+
+class Curso {
+    public $nome;
+    private $alunos = []; // Associação com múltiplos alunos
+    
+    public function __construct($nome) {
+        $this->nome = $nome;
+    }
+    
+    public function adicionarAluno($aluno) {
+        $this->alunos[] = $aluno;
+    }
+    
+    public function listarAlunos() {
+        return $this->alunos;
+    }
+}
+
+// USO DA ASSOCIAÇÃO
+$aluno1 = new Aluno("João Silva");
+$aluno2 = new Aluno("Maria Santos");
+
+$cursoPHP = new Curso("PHP Avançado");
+$cursoSQL = new Curso("Banco de Dados");
+
+// Estabelecendo associações
+$aluno1->matricular($cursoPHP);
+$aluno1->matricular($cursoSQL);
+$aluno2->matricular($cursoPHP);
+
+// As classes continuam independentes
+// Podemos remover associações sem destruir objetos
+?&gt;</code></pre>
+                        </div>
+                    </div>
+                    
+                    <div class="complex-example">
+                        <h4>🔄 Associação Bidirecional</h4>
+                        <p>Quando ambas as classes mantêm referência uma da outra:</p>
+                        <pre><code class="php">// No método matricular() da classe Aluno:
+$this->cursos[] = $curso;
+$curso->adicionarAluno($this); // Referência bidirecional</code></pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SEÇÃO: AGREGAÇÃO -->
+        <section id="aggregation" class="study-section">
+            <div class="intro">
+                <h2>👥 Agregação entre Classes</h2>
+                <p>Relação "todo-parte" onde a parte pode existir independentemente do todo.</p>
+            </div>
+            
+            <div class="relationship-section aggregation">
+                <div class="section-header">
+                    <h3>Agregação</h3>
+                </div>
+                <div class="section-body">
+                    <div class="explanation">
+                        <p><strong>Características:</strong></p>
+                        <ul>
+                            <li>Relação todo-parte</li>
+                            <li>Parte pode existir sem o todo</li>
+                            <li>Geralmente usa coleções (arrays)</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="example">
+                        <p><strong>Exemplo Prático:</strong> <em>Universidade</em> e <em>Departamento</em></p>
+                        <p>Uma universidade é composta por departamentos, mas os departamentos podem existir independentemente.</p>
+                    </div>
+                    
+                    <div class="code-section">
+                        <div class="code-header">
+                            <span>Implementação de Agregação em PHP</span>
+                        </div>
+                        <div class="code-body">
+                            <pre><code class="php">&lt;?php
+class Universidade {
+    public $nome;
+    private $departamentos = []; // AGREGAÇÃO: departamentos são partes da universidade
+    
+    public function __construct($nome) {
+        $this->nome = $nome;
+    }
+    
+    // AGREGAÇÃO: Universidade adiciona departamentos existentes
+    public function adicionarDepartamento($departamento) {
+        $this->departamentos[] = $departamento;
+    }
+    
+    // AGREGAÇÃO: Pode remover departamentos sem destruí-los
+    public function removerDepartamento($departamento) {
+        $key = array_search($departamento, $this->departamentos);
+        if ($key !== false) {
+            unset($this->departamentos[$key]);
+        }
+    }
+    
+    public function listarDepartamentos() {
+        return $this->departamentos;
+    }
+}
+
+class Departamento {
+    public $nome;
+    public $chefe;
+    
+    public function __construct($nome, $chefe) {
+        $this->nome = $nome;
+        $this->chefe = $chefe;
+    }
+    
+    // Departamento pode existir sem universidade
+    public function funcionar() {
+        return "Departamento {$this->nome} funcionando sob chefia de {$this->chefe}";
+    }
+}
+
+// DEMONSTRAÇÃO DA AGREGAÇÃO
+$universidade = new Universidade("Universidade Federal");
+
+// Departamentos existem independentemente
+$deptInformatica = new Departamento("Informática", "Dr. Silva");
+$deptMatematica = new Departamento("Matemática", "Dr. Santos");
+
+// Universidade agrega departamentos
+$universidade->adicionarDepartamento($deptInformatica);
+$universidade->adicionarDepartamento($deptMatematica);
+
+// Departamento continua existindo se removido
+$universidade->removerDepartamento($deptInformatica);
+echo $deptInformatica->funcionar(); // Ainda funciona!
+?&gt;</code></pre>
+                        </div>
+                    </div>
+                    
+                    <div class="warning">
+                        <h4>⚠️ Cuidado com Agregação!</h4>
+                        <p>Na agregação, a parte deve ser capaz de existir independentemente. Se remover o todo, as partes devem continuar funcionando.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SEÇÃO: COMPOSIÇÃO -->
+        <section id="composition" class="study-section">
+            <div class="intro">
+                <h2>🔗 Composição entre Classes</h2>
+                <p>Relação forte "todo-parte" onde a parte não existe sem o todo.</p>
+            </div>
+            
+            <div class="relationship-section composition">
+                <div class="section-header">
+                    <h3>Composição</h3>
+                </div>
+                <div class="section-body">
+                    <div class="explanation">
+                        <p><strong>Características:</strong></p>
+                        <ul>
+                            <li>Relação todo-parte forte</li>
+                            <li>Parte é criada dentro do todo</li>
+                            <li>Parte não existe independentemente</li>
+                            <li>Ciclo de vida vinculado</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="example">
+                        <p><strong>Exemplo Prático:</strong> <em>Casa</em> e <em>Sala</em></p>
+                        <p>Uma casa é composta por salas, mas as salas não existem sem a casa.</p>
+                    </div>
+                    
+                    <div class="code-section">
+                        <div class="code-header">
+                            <span>Implementação de Composição em PHP</span>
+                        </div>
+                        <div class="code-body">
+                            <pre><code class="php">&lt;?php
+class Casa {
+    public $endereco;
+    private $salas = []; // COMPOSIÇÃO: salas são partes da casa
+    
+    public function __construct($endereco) {
+        $this->endereco = $endereco;
+        $this->criarSalas(); // Salas são criadas DENTRO da casa
+    }
+    
+    // COMPOSIÇÃO: Salas são criadas durante a construção da casa
+    private function criarSalas() {
+        $this->salas[] = new Sala("Sala de Estar", 20);
+        $this->salas[] = new Sala("Quarto", 15);
+        $this->salas[] = new Sala("Cozinha", 12);
+    }
+    
+    public function getSalas() {
+        return $this->salas;
+    }
+    
+    // Quando a casa é destruída, as salas também são
+    public function __destruct() {
+        foreach ($this->salas as $sala) {
+            // Sala será destruída junto com a casa
+        }
+    }
+}
+
+class Sala {
+    public $nome;
+    public $metrosQuadrados;
+    
+    public function __construct($nome, $metrosQuadrados) {
+        $this->nome = $nome;
+        $this->metrosQuadrados = $metrosQuadrados;
+    }
+    
+    public function descricao() {
+        return "{$this->nome} - {$this->metrosQuadrados}m²";
+    }
+}
+
+// USO DA COMPOSIÇÃO
+$minhaCasa = new Casa("Rua das Flores, 123");
+
+// Acessando salas (que foram criadas dentro da casa)
+foreach ($minhaCasa->getSalas() as $sala) {
+    echo $sala->descricao() . "\n";
+}
+
+// As salas não podem existir fora da casa
+// Se $minhaCasa for destruída, as salas também serão
+?&gt;</code></pre>
+                        </div>
+                    </div>
+                    
+                    <div class="tips">
+                        <h4>💡 Quando usar Composição:</h4>
+                        <ul>
+                            <li>Quando a parte não faz sentido sem o todo</li>
+                            <li>Quando o ciclo de vida está vinculado</li>
+                            <li>Para encapsular funcionalidades complexas</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SEÇÃO: AVANÇADO -->
+        <section id="advanced" class="study-section">
+            <div class="intro">
+                <h2>🚀 Tópicos Avançados</h2>
+                <p>Padrões de projeto e técnicas avançadas de relacionamento entre classes.</p>
+            </div>
+            
+            <div class="relationship-section advanced">
+                <div class="section-header">
+                    <h3>Injeção de Dependência</h3>
+                </div>
+                <div class="section-body">
+                    <div class="explanation">
+                        <p>Técnica onde as dependências são "injetadas" em uma classe, em vez de serem criadas dentro dela.</p>
+                    </div>
+                    
+                    <div class="code-section">
+                        <div class="code-header">
+                            <span>Injeção de Dependência em PHP</span>
+                        </div>
+                        <div class="code-body">
+                            <pre><code class="php">&lt;?php
+interface DatabaseConnection {
+    public function query($sql);
+}
+
+class MySQLConnection implements DatabaseConnection {
+    public function query($sql) {
+        return "Executando no MySQL: $sql";
+    }
+}
+
+class UserRepository {
+    private $db;
+    
+    // INJEÇÃO DE DEPENDÊNCIA: Recebe a conexão instead de criá-la
+    public function __construct(DatabaseConnection $db) {
+        $this->db = $db;
+    }
+    
+    public function findUser($id) {
+        return $this->db->query("SELECT * FROM users WHERE id = $id");
+    }
+}
+
+// USO COM INJEÇÃO DE DEPENDÊNCIA
+$db = new MySQLConnection();
+$userRepo = new UserRepository($db); // Dependência injetada
+echo $userRepo->findUser(1);
+?&gt;</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="relationship-section advanced">
+                <div class="section-header">
+                    <h3>Padrão Factory</h3>
+                </div>
+                <div class="section-body">
+                    <div class="code-section">
+                        <div class="code-header">
+                            <span>Padrão Factory para Criação de Objetos</span>
+                        </div>
+                        <div class="code-body">
+                            <pre><code class="php">&lt;?php
+class VeiculoFactory {
+    public static function criar($tipo, $modelo) {
+        switch ($tipo) {
+            case 'carro':
+                return new Carro($modelo);
+            case 'moto':
+                return new Moto($modelo);
+            case 'caminhao':
+                return new Caminhao($modelo);
+            default:
+                throw new Exception("Tipo de veículo não suportado");
+        }
+    }
+}
+
+class Carro {
+    public function __construct($modelo) {
+        $this->modelo = $modelo;
+    }
+}
+
+// USO DO FACTORY
+$meuCarro = VeiculoFactory::criar('carro', 'Fusca');
+?&gt;</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SEÇÃO: EXERCÍCIOS -->
+        <section id="exercises" class="study-section">
+            <div class="intro">
+                <h2>💪 Exercícios Práticos</h2>
+                <p>Pratique os conceitos aprendidos com estes exercícios.</p>
+            </div>
+            
+            <div class="practice-exercise">
+                <div class="exercise-header">
+                    <h3>🎯 Exercício 1: Sistema de Biblioteca</h3>
+                </div>
+                <p><strong>Contexto:</strong> Crie um sistema para uma biblioteca com Livros, Autores e Usuários.</p>
+                <p><strong>Requisitos:</strong></p>
+                <ul>
+                    <li>Um Livro pode ter múltiplos Autores (Associação)</li>
+                    <li>Uma Biblioteca contém Livros (Agregação)</li>
+                    <li>Um Livro é composto por Capítulos (Composição)</li>
+                    <li>Usuários podem emprestar Livros (Associação)</li>
+                </ul>
+                
+                <div class="code-section">
+                    <div class="code-header">
+                        <span>Estrutura Inicial - Complete o Código</span>
+                    </div>
+                    <div class="code-body">
+                        <pre><code class="php">&lt;?php
+class Biblioteca {
+    private $livros = [];
+    // Implemente os métodos...
+}
+
+class Livro {
+    private $titulo;
+    private $autores = [];
+    private $capitulos = [];
+    // Implemente os métodos...
+}
+
+class Autor {
+    private $nome;
+    // Implemente os métodos...
+}
+
+class Capitulo {
+    private $titulo;
+    private $paginas;
+    // Implemente os métodos...
+}
+
+class Usuario {
+    private $nome;
+    private $livrosEmprestados = [];
+    // Implemente os métodos...
+}
+?&gt;</code></pre>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="practice-exercise">
+                <div class="exercise-header">
+                    <h3>🎯 Exercício 2: Sistema de E-commerce</h3>
+                </div>
+                <p><strong>Contexto:</strong> Desenvolva um sistema de e-commerce com Produtos, Categorias, Carrinho e Pedidos.</p>
+                <p><strong>Requisitos:</strong></p>
+                <ul>
+                    <li>Um Produto pertence a uma Categoria (Associação)</li>
+                    <li>Um Carrinho contém Itens (Composição)</li>
+                    <li>Um Pedido é composto por Itens (Composição)</li>
+                    <li>Clientes fazem Pedidos (Associação)</li>
+                </ul>
+            </div>
+        </section>
+    </div>
+    
+    <footer>
+        <p>📚 Caderno de Estudos PHP - Relacionamento entre Classes</p>
+        <p>Próximo caderno: Herança e Polimorfismo em PHP</p>
+    </footer>
+
+    <script>
+        // Navegação entre abas
+        document.querySelectorAll('.nav-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                // Remove active de todas as abas
+                document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.study-section').forEach(s => s.classList.remove('active'));
+                
+                // Adiciona active na aba clicada
+                this.classList.add('active');
+                
+                // Mostra a seção correspondente
+                const targetId = this.getAttribute('data-tab');
+                document.getElementById(targetId).classList.add('active');
+            });
+        });
+
+        // Adiciona tooltips para códigos
+        document.querySelectorAll('pre code').forEach(block => {
+            block.addEventListener('mouseenter', function() {
+                this.title = 'Clique para copiar';
+            });
+            
+            block.addEventListener('click', function() {
+                navigator.clipboard.writeText(this.textContent);
+                const originalText = this.title;
+                this.title = 'Copiado!';
+                setTimeout(() => {
+                    this.title = originalText;
+                }, 2000);
+            });
+        });
+    </script>
+</body>
+</html>
