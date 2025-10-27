@@ -88,3 +88,19 @@ CREATE TABLE Manutencao_Equipamento (
     FOREIGN KEY (Cod_Equipamento) REFERENCES Equipamento(Cod_Equipamento),
     FOREIGN KEY (Cod_Funcionario) REFERENCES Funcionario(Cod_Funcionario)
 );
+
+-- ==============================
+-- TABELA para teste com INSERT na aula de 20.10
+-- ==============================
+CREATE TABLE cliente_novo (
+    NOME VARCHAR(40) NOT NULL,
+    EMAIL VARCHAR(50) NOT NULL
+);
+
+ALTER TABLE cliente_novo
+ADD CPF VARCHAR(14) UNIQUE NOT NULL,
+ADD ENDERECO VARCHAR(50) NOT NULL,
+ADD PROFISSAO VARCHAR(30) NOT NULL,
+ADD DATA_NASC DATE;
+
+SELECT * FROM cliente_novo;

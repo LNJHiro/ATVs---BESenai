@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Discos</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #243377 0%, #27133b 100%);
+            margin: 0;
+            padding: 20px;
+            color: white;
+        }
+        .container {
+            max-width: 500px;
+            margin: 50px auto;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.9);
+        }
+        .btn-submit {
+            width: 100%;
+            padding: 12px;
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .btn-submit:hover {
+            background: #ff5252;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎵 Cadastrar Novo Disco</h1>
+        <form action="DiscosInsert.php" method="POST">
+            <div class="form-group">
+                <label for="titulo">Título do Álbum:</label>
+                <input type="text" id="titulo" name="titulo" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="artista">Artista/Banda:</label>
+                <input type="text" id="artista" name="artista" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="ano_lancamento">Ano de Lançamento:</label>
+                <input type="number" id="ano_lancamento" name="ano_lancamento" min="1900" max="2024">
+            </div>
+            
+            <div class="form-group">
+                <label for="genero">Gênero Musical:</label>
+                <input type="text" id="genero" name="genero" placeholder="Ex: Rock, Jazz, MPB...">
+            </div>
+            
+            <button type="submit" class="btn-submit">Cadastrar Disco</button>
+        </form>
+    </div>
+</body>
+</html>

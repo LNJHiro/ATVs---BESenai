@@ -1,0 +1,95 @@
+/* Fundo com imagem fixa e overlay escuro */
+body {
+    font-family: 'Poppins', sans-serif;
+    background: url('https://i.pinimg.com/736x/d7/b8/99/d7b89990bb9fedbef2fefeb4eb60265f.jpg') no-repeat center center fixed;
+    background-size: cover;
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    position: relative;
+    color: #333;
+}
+
+/* Efeito de leve escurecimento no fundo */
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4);
+    z-index: 0;
+}
+
+/* Container central */
+.container {
+    position: relative;
+    z-index: 1;
+    background-color: rgba(255, 255, 255, 0.493);
+    max-width: 400px;
+    margin: 80px auto;
+    padding: 30px 40px;
+    border-radius: 12px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+    text-align: left;
+}
+
+h1 {
+    text-align: center;
+    color: #4A2C2A;
+    margin-bottom: 20px;
+}
+
+/* Estilo dos campos */
+form {
+    display: flex;
+    flex-direction: column;
+}
+
+label {
+    font-weight: bold;
+    margin-top: 10px;
+    color: #3b2e2a;
+}
+
+input {
+    padding: 10px;
+    border: 1px solid #b8a59b;
+    border-radius: 6px;
+    margin-top: 5px;
+    font-size: 15px;
+    background-color: #fffdfc;
+    transition: all 0.3s ease;
+}
+
+input:focus {
+    border-color: #6b4f3f;
+    outline: none;
+    background-color: #fff;
+}
+
+/* Botão com efeito */
+button {
+    margin-top: 20px;
+    padding: 12px;
+    background-color: #4A2C2A;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+button:hover {
+    background-color: #6d3d32;
+    transform: scale(1.05);
+}
+
+/* Responsividade */
+@media (max-width: 480px) {
+    .container {
+        margin: 50px 20px;
+        padding: 25px;
+    }
+}
