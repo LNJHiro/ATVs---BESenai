@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Discos</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #243377 0%, #27133b 100%);
+            margin: 0;
+            padding: 20px;
+            color: white;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 500px;
+            margin: 50px auto;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.95);
+            font-size: 16px;
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+        }
+        input:focus, select:focus {
+            outline: none;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.3);
+            transform: translateY(-2px);
+        }
+        .btn-submit {
+            width: 100%;
+            padding: 15px;
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+        .btn-submit:hover {
+            background: #ff5252;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 82, 82, 0.4);
+        }
+        .btn-submit:active {
+            transform: translateY(0);
+        }
+        .link-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .link-listar {
+            color: #ffd700;
+            text-decoration: none;
+            font-weight: bold;
+            transition: color 0.3s;
+        }
+        .link-listar:hover {
+            color: #ffed4e;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎵 Cadastrar Novo Disco</h1>
+        <form action="DiscosInsert.php" method="POST">
+            <div class="form-group">
+                <label for="titulo">Título do Álbum:</label>
+                <input type="text" id="titulo" name="titulo" required 
+                       placeholder="Ex: The Dark Side of the Moon">
+            </div>
+            
+            <div class="form-group">
+                <label for="artista">Artista/Banda:</label>
+                <input type="text" id="artista" name="artista" required 
+                       placeholder="Ex: Pink Floyd">
+            </div>
+            
+            <div class="form-group">
+                <label for="ano_lancamento">Ano de Lançamento:</label>
+                <input type="number" id="ano_lancamento" name="ano_lancamento" 
+                       min="1900" max="2024" placeholder="Ex: 1973">
+            </div>
+            
+            <div class="form-group">
+                <label for="genero">Gênero Musical:</label>
+                <input type="text" id="genero" name="genero" 
+                       placeholder="Ex: Rock Progressivo, Heavy Metal...">
+            </div>
+            
+            <button type="submit" class="btn-submit">🎵 Cadastrar Disco</button>
+        </form>
+
+        <div class="link-container">
+            <a href="DiscosListar.php" class="link-listar">📀 Ver Lista de Discos</a>
+        </div>
+    </div>
+</body>
+</html>
