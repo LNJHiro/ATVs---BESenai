@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Caderno de Anotações - MVC</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            line-height: 1.6;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .caderno {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .cabecalho {
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .cabecalho h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .cabecalho .subtitulo {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .conteudo {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            min-height: 800px;
+        }
+
+        .sidebar {
+            background: #f8f9fa;
+            padding: 30px 20px;
+            border-right: 3px solid #e9ecef;
+        }
+
+        .menu {
+            position: sticky;
+            top: 20px;
+        }
+
+        .menu-item {
+            padding: 15px 20px;
+            margin: 10px 0;
+            background: white;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .menu-item:hover {
+            transform: translateX(5px);
+            border-left-color: #3498db;
+        }
+
+        .menu-item.ativo {
+            background: #3498db;
+            color: white;
+            border-left-color: #2980b9;
+        }
+
+        .principal {
+            padding: 40px;
+            background: white;
+        }
+
+        .secao {
+            display: none;
+        }
+
+        .secao.ativa {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #3498db;
+        }
+
+        h3 {
+            color: #34495e;
+            margin: 25px 0 15px 0;
+        }
+
+        .card {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 5px solid #3498db;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .card.model { border-left-color: #e74c3c; }
+        .card.view { border-left-color: #2ecc71; }
+        .card.controller { border-left-color: #f39c12; }
+
+        .codigo {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+
+        .comentario { color: #7f8c8d; }
+        .classe { color: #e74c3c; }
+        .funcao { color: #3498db; }
+        .variavel { color: #f39c12; }
+        .string { color: #2ecc71; }
+
+        .fluxo-mvc {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .componente {
+            text-align: center;
+            padding: 30px 20px;
+            border-radius: 10px;
+            color: white;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        .model-comp { background: linear-gradient(135deg, #e74c3c, #c0392b); }
+        .view-comp { background: linear-gradient(135deg, #2ecc71, #27ae60); }
+        .controller-comp { background: linear-gradient(135deg, #f39c12, #d35400); }
+
+        .dica {
+            background: #fff3cd;
+            border: 2px solid #ffeaa7;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        .dica:before {
+            content: "💡";
+            position: absolute;
+            left: -10px;
+            top: -10px;
+            background: #fdcb6e;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2em;
+        }
+
+        .correcao {
+            background: #d4edda;
+            border: 2px solid #c3e6cb;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .arquivo {
+            background: #34495e;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            display: inline-block;
+            margin: 5px 0;
+            font-family: 'Courier New', monospace;
+        }
+
+        .linhas-codigo {
+            counter-reset: linha;
+        }
+
+        .linha {
+            display: block;
+            padding: 2px 0;
+        }
+
+        .linha:before {
+            counter-increment: linha;
+            content: counter(linha);
+            display: inline-block;
+            width: 40px;
+            color: #7f8c8d;
+            text-align: right;
+            margin-right: 15px;
+            border-right: 1px solid #7f8c8d;
+            padding-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="caderno">
+        <div class="cabecalho">
+            <h1>📓 Caderno de Anotações - MVC</h1>
+            <div class="subtitulo">Padrão Arquitetural com Exemplos Práticos - Sistema de Bebidas</div>
+        </div>
+
+        <div class="conteudo">
+            <div class="sidebar">
+                <div class="menu">
+                    <div class="menu-item ativo" onclick="mostrarSecao('oque-e-mvc')">🎯 O que é MVC?</div>
+                    <div class="menu-item" onclick="mostrarSecao('estrutura')">📁 Estrutura de Pastas</div>
+                    <div class="menu-item" onclick="mostrarSecao('model')">🏗️ Model (Bebidas.php)</div>
+                    <div class="menu-item" onclick="mostrarSecao('dao')">💾 Model (BebidasDAO.php)</div>
+                    <div class="menu-item" onclick="mostrarSecao('controller')">🎮 Controller</div>
+                    <div class="menu-item" onclick="mostrarSecao('view')">🎨 View</div>
+                    <div class="menu-item" onclick="mostrarSecao('fluxo')">🔄 Fluxo MVC</div>
+                    <div class="menu-item" onclick="mostrarSecao('correcoes')">🔧 Correções</div>
+                    <div class="menu-item" onclick="mostrarSecao('boas-praticas')">💡 Boas Práticas</div>
+                </div>
+            </div>
+
+            <div class="principal">
+                <!-- Seção: O que é MVC -->
+                <div id="oque-e-mvc" class="secao ativa">
+                    <h2>🎯 O que é o Padrão MVC?</h2>
+                    
+                    <div class="card">
+                        <h3>Definição</h3>
+                        <p><strong>MVC (Model-View-Controller)</strong> é um padrão arquitetural que separa a aplicação em três componentes principais:</p>
+                    </div>
+
+                    <div class="fluxo-mvc">
+                        <div class="componente model-comp">
+                            <h3>🏗️ MODEL</h3>
+                            <p>Gerencia os dados e regras de negócio</p>
+                            <ul style="text-align: left; margin-top: 15px;">
+                                <li>Representa os dados</li>
+                                <li>Lógica de negócio</li>
+                                <li>Acesso a dados</li>
+                                <li>Validações</li>
+                            </ul>
+                        </div>
+
+                        <div class="componente view-comp">
+                            <h3>🎨 VIEW</h3>
+                            <p>Interface com o usuário</p>
+                            <ul style="text-align: left; margin-top: 15px;">
+                                <li>Apresentação dos dados</li>
+                                <li>Formulários HTML</li>
+                                <li>Interface visual</li>
+                                <li>Coleta inputs</li>
+                            </ul>
+                        </div>
+
+                        <div class="componente controller-comp">
+                            <h3>🎮 CONTROLLER</h3>
+                            <p>Intermediário entre View e Model</p>
+                            <ul style="text-align: left; margin-top: 15px;">
+                                <li>Processa requisições</li>
+                                <li>Chama Model</li>
+                                <li>Retorna para View</li>
+                                <li>Orquestração</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="dica">
+                        <strong>🎯 Por que usar MVC?</strong><br>
+                        • Código organizado e manutenível<br>
+                        • Facilita trabalho em equipe<br>
+                        • Separação de responsabilidades<br>
+                        • Reutilização de código
+                    </div>
+                </div>
+
+                <!-- Seção: Estrutura de Pastas -->
+                <div id="estrutura" class="secao">
+                    <h2>📁 Estrutura de Pastas MVC</h2>
+                    
+                    <div class="codigo">
+projeto/
+├── <span class="classe">controller/</span>
+│   └── BebidasController.php    // Controla o fluxo
+├── <span class="classe">model/</span>
+│   ├── Bebidas.php             // Entidade Bebida
+│   └── BebidasDAO.php          // Acesso a dados
+└── <span class="classe">view/</span>
+    └── index.php               // Interface usuário
+                    </div>
+
+                    <div class="card">
+                        <h3>Relacionamento entre Pastas</h3>
+                        <p><strong>Controller</strong> → Requer Model</p>
+                        <p><strong>View</strong> → Requer Controller</p>
+                        <p><strong>Model</strong> → Independente</p>
+                    </div>
+                </div>
+
+                <!-- Seção: Model Bebidas.php -->
+                <div id="model" class="secao">
+                    <h2>🏗️ MODEL - Bebidas.php</h2>
+                    <p>Representa a entidade Bebida no sistema</p>
+
+                    <div class="codigo linhas-codigo">
+<span class="linha"><span class="classe">class Bebida</span> {</span>
+<span class="linha">    <span class="variavel">private $nome</span>;</span>
+<span class="linya">    <span class="variavel">private $categoria</span>;</span>
+<span class="linha">    <span class="variavel">private $volume</span>;</span>
+<span class="linha">    <span class="variavel">private $valor</span>;</span>
+<span class="linha">    <span class="variavel">private $qtde</span>;</span>
+<span class="linha"></span>
+<span class="linha">    <span class="funcao">public function __construct</span>($nome, $categoria, $volume, $valor, $qtde){</span>
+<span class="linha">        <span class="variavel">$this</span>->nome = $nome;</span>
+<span class="linha">        <span class="variavel">$this</span>->categoria = $categoria;</span>
+<span class="linha">        <span class="variavel">$this</span>->volume = $volume;</span>
+<span class="linha">        <span class="variavel">$this</span>->valor = $valor;</span>
+<span class="linha">        <span class="variavel">$this</span>->qtde = $qtde;</span>
+<span class="linha">    }</span>
+<span class="linha"></span>
+<span class="linha">    <span class="comentario">// GETTERS - Acesso às propriedades</span></span>
+<span class="linha">    <span class="funcao">public function getNome</span>() {</span>
+<span class="linha">        <span class="funcao">return</span> <span class="variavel">$this</span>->nome;</span>
+<span class="linha">    }</span>
+<span class="linha"></span>
+<span class="linha">    <span class="comentario">// SETTERS - Modificação com method chaining</span></span>
+<span class="linha">    <span class="funcao">public function setNome</span>($nome) {</span>
+<span class="linha">        <span class="variavel">$this</span>->nome = $nome;</span>
+<span class="linha">        <span class="funcao">return</span> <span class="variavel">$this</span>; <span class="comentario">// Method chaining</span></span>
+<span class="linha">    }</span>
+<span class="linha">}</span>
+                    </div>
+
+                    <div class="dica">
+                        <strong>🏗️ Características do Model:</strong><br>
+                        • <strong>Encapsulamento:</strong> Propriedades privadas<br>
+                        • <strong>Getters/Setters:</strong> Controle de acesso<br>
+                        • <strong>Method Chaining:</strong> return $this permite encadeamento
+                    </div>
+                </div>
+
+                <!-- Seção: DAO -->
+                <div id="dao" class="secao">
+                    <h2>💾 MODEL - BebidasDAO.php</h2>
+                    <p>Data Access Object - Gerencia operações de banco de dados</p>
+
+                    <div class="codigo">
+<span class="classe">class BebidaDAO</span> {
+    <span class="variavel">private $bebidasArray</span> = [];
+    <span class="variavel">private $arquivoJson</span> = <span class="string">'bebidas.json'</span>;
+
+    <span class="comentario">// CREATE - Adiciona nova bebida</span>
+    <span class="funcao">public function criarBebida</span>(Bebida $bebida){
+        <span class="variavel">$this</span>->bebidasArray[<span class="variavel">$bebida</span>->getNome()] = <span class="variavel">$bebida</span>;
+        <span class="variavel">$this</span>->salvarArquivo();
+    }
+
+    <span class="comentario">// READ - Retorna todas as bebidas</span>
+    <span class="funcao">public function lerBebidas</span>(){
+        <span class="funcao">return</span> <span class="variavel">$this</span>->bebidasArray;
+    }
+
+    <span class="comentario">// UPDATE - Atualiza dados</span>
+    <span class="funcao">public function atualizarBebida</span>($nome, $novoValor, $novaQtde){
+        <span class="funcao">if</span>(<span class="funcao">isset</span>(<span class="variavel">$this</span>->bebidasArray[$nome])){
+            <span class="variavel">$this</span>->bebidasArray[$nome]->setValor($novoValor);
+            <span class="variavel">$this</span>->bebidasArray[$nome]->setQtde($novaQtde);
+        }
+        <span class="variavel">$this</span>->salvarArquivo();
+    }
+}
+                    </div>
+
+                    <div class="card">
+                        <h3>📊 Operações CRUD</h3>
+                        <p><strong>C</strong>REATE - criarBebida()</p>
+                        <p><strong>R</strong>EAD - lerBebidas()</p>
+                        <p><strong>U</strong>PDATE - atualizarBebida()</p>
+                        <p><strong>D</strong>ELETE - excluirBebida()</p>
+                    </div>
+                </div>
+
+                <!-- Seção: Controller -->
+                <div id="controller" class="secao">
+                    <h2>🎮 CONTROLLER - BebidasController.php</h2>
+                    <p>Intermediário entre View e Model</p>
+
+                    <div class="codigo">
+<span class="classe">class BebidaController</span> {
+    <span class="variavel">private $dao</span>;
+
+    <span class="funcao">public function __construct</span>() {
+        <span class="variavel">$this</span>->dao = <span class="funcao">new BebidaDAO()</span>;
+    }
+
+    <span class="comentario">// Delega para o Model</span>
+    <span class="funcao">public function criar</span>($nome, $categoria, $volume, $valor, $qtde) {
+        <span class="variavel">$bebida</span> = <span class="funcao">new Bebida</span>($nome, $categoria, $volume, $valor, $qtde);
+        <span class="variavel">$this</span>->dao->criarBebida(<span class="variavel">$bebida</span>);
+    }
+
+    <span class="funcao">public function ler</span>() {
+        <span class="funcao">return</span> <span class="variavel">$this</span>->dao->lerBebidas();
+    }
+}
+                    </div>
+
+                    <div class="dica">
+                        <strong>🎮 Responsabilidades do Controller:</strong><br>
+                        • Recebe dados da View<br>
+                        • Valida informações<br>
+                        • Chama métodos do Model<br>
+                        • Retorna resposta para View
+                    </div>
+                </div>
+
+                <!-- Seção: View -->
+                <div id="view" class="secao">
+                    <h2>🎨 VIEW - index.php</h2>
+                    <p>Interface do usuário - HTML + PHP</p>
+
+                    <div class="codigo">
+<span class="comentario">// ⚡ CONTROLLER - Processa ações</span>
+<span class="funcao">require_once</span> <span class="string">"../controller/BebidasController.php"</span>;
+<span class="variavel">$controller</span> = <span class="funcao">new BebidaController()</span>;
+
+<span class="comentario">// Detecta ações do usuário</span>
+<span class="funcao">if</span> (<span class="variavel">$_SERVER</span>[<span class="string">'REQUEST_METHOD'</span>] === <span class="string">'POST'</span>) {
+    <span class="funcao">if</span> (<span class="variavel">$_POST</span>[<span class="string">'acao'</span>] === <span class="string">'salvar'</span>) {
+        <span class="variavel">$controller</span>->criar(<span class="variavel">$_POST</span>[<span class="string">'nome'</span>], <span class="variavel">$_POST</span>[<span class="string">'categoria'</span>], 
+                          <span class="variavel">$_POST</span>[<span class="string">'volume'</span>], <span class="variavel">$_POST</span>[<span class="string">'valor'</span>], <span class="variavel">$_POST</span>[<span class="string">'qtde'</span>]);
+    }
+}
+                    </div>
+
+                    <div class="card view">
+                        <h3>📝 Formulário HTML</h3>
+                        <p>A View coleta dados via formulário e envia para o Controller</p>
+                        <p><strong>Nunca</strong> acessa o Model diretamente!</p>
+                    </div>
+                </div>
+
+                <!-- Seção: Fluxo -->
+                <div id="fluxo" class="secao">
+                    <h2>🔄 Fluxo Completo MVC</h2>
+
+                    <div style="text-align: center; margin: 30px 0;">
+                        <div style="display: inline-block; text-align: left;">
+                            <div>1. 👤 <strong>USUÁRIO</strong> preenche formulário</div>
+                            <div style="margin-left: 20px;">↓</div>
+                            <div>2. 🎨 <strong>VIEW</strong> envia dados via POST</div>
+                            <div style="margin-left: 20px;">↓</div>
+                            <div>3. 🎮 <strong>CONTROLLER</strong> processa requisição</div>
+                            <div style="margin-left: 20px;">↓</div>
+                            <div>4. 🏗️ <strong>MODEL</strong> salva dados no JSON</div>
+                            <div style="margin-left: 20px;">↓</div>
+                            <div>5. 🎮 <strong>CONTROLLER</strong> retorna resposta</div>
+                            <div style="margin-left: 20px;">↓</div>
+                            <div>6. 🎨 <strong>VIEW</strong> mostra resultado</div>
+                            <div style="margin-left: 20px;">↓</div>
+                            <div>7. 👤 <strong>USUÁRIO</strong> vê confirmação</div>
+                        </div>
+                    </div>
+
+                    <div class="dica">
+                        <strong>📌 Regra de Ouro do MVC:</strong><br>
+                        "A View <strong>NUNCA</strong> se comunica diretamente com o Model,<br>
+                        apenas com o Controller!"
+                    </div>
+                </div>
+
+                <!-- Seção: Correções -->
+                <div id="correcoes" class="secao">
+                    <h2>🔧 Correções Necessárias</h2>
+
+                    <div class="correcao">
+                        <h3>⚠️ Problema 1: Inconsistência no Formulário</h3>
+                        <p><strong>No arquivo:</strong> <span class="arquivo">index.php</span></p>
+                        
+                        <div class="codigo">
+<span class="comentario">// ❌ ERRADO:</span>
+&lt;input type="hidden" name="acao" value="criar"&gt;
+
+<span class="comentario">// ✅ CORRETO:</span>
+&lt;input type="hidden" name="acao" value="salvar"&gt;
+                        </div>
+                    </div>
+
+                    <div class="correcao">
+                        <h3>⚠️ Problema 2: Método Atualizar Incompleto</h3>
+                        <p><strong>No arquivo:</strong> <span class="arquivo">BebidasController.php</span></p>
+                        
+                        <div class="codigo">
+<span class="comentario">// ❌ INCOMPLETO:</span>
+<span class="funcao">public function atualizar</span>($nome, $valor, $qtde) {
+    <span class="comentario">// Faltam parâmetros!</span>
+}
+
+<span class="comentario">// ✅ COMPLETO:</span>
+<span class="funcao">public function atualizar</span>($nome, $categoria, $volume, $valor, $qtde) {
+    <span class="variavel">$this</span>->dao->atualizarBebida($nome, $categoria, $volume, $valor, $qtde);
+}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Seção: Boas Práticas -->
+                <div id="boas-praticas" class="secao">
+                    <h2>💡 Boas Práticas MVC</h2>
+
+                    <div class="card">
+                        <h3>✅ O QUE FAZER</h3>
+                        <p><strong>Validações no Controller:</strong></p>
+                        <div class="codigo">
+<span class="funcao">public function criar</span>($nome, $categoria, $volume, $valor, $qtde) {
+    <span class="comentario">// Valida antes de criar</span>
+    <span class="funcao">if</span>(<span class="funcao">empty</span>($nome) || $valor &lt;= 0) {
+        <span class="funcao">throw new Exception</span>(<span class="string">"Dados inválidos"</span>);
+    }
+    <span class="variavel">$bebida</span> = <span class="funcao">new Bebida</span>($nome, $categoria, $volume, $valor, $qtde);
+    <span class="variavel">$this</span>->dao->criarBebida(<span class="variavel">$bebida</span>);
+}
+                        </div>
+                    </div>
+
+                    <div class="card" style="background: #f8d7da; border-left-color: #dc3545;">
+                        <h3>❌ O QUE EVITAR</h3>
+                        <p><strong>View acessando Model diretamente:</strong></p>
+                        <div class="codigo">
+<span class="comentario">// ❌ ERRADO - View acessa Model:</span>
+<span class="variavel">$dao</span> = <span class="funcao">new BebidaDAO()</span>;
+<span class="variavel">$dao</span>->criarBebida(<span class="variavel">$bebida</span>);
+
+<span class="comentario">// ✅ CORRETO - View chama Controller:</span>
+<span class="variavel">$controller</span>->criar($dados);
+                        </div>
+                    </div>
+
+                    <div class="dica">
+                        <strong>🚀 Próximos Passos:</strong><br>
+                        1. Entendeu MVC? → Pratique criando CRUD completo<br>
+                        2. Domina conceitos? → Adicione edição e listagem<br>
+                        3. Quer evoluir? → Migre para MySQL
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function mostrarSecao(secaoId) {
+            // Esconde todas as seções
+            document.querySelectorAll('.secao').forEach(secao => {
+                secao.classList.remove('ativa');
+            });
+            
+            // Remove classe ativa de todos os itens do menu
+            document.querySelectorAll('.menu-item').forEach(item => {
+                item.classList.remove('ativo');
+            });
+            
+            // Mostra a seção clicada
+            document.getElementById(secaoId).classList.add('ativa');
+            
+            // Marca o item do menu como ativo
+            event.target.classList.add('ativo');
+        }
+    </script>
+</body>
+</html>

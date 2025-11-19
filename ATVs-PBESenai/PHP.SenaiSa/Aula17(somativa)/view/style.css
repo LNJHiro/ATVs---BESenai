@@ -1,0 +1,138 @@
+/* ============================================================
+   ESTILO GERAL E CONFIGURAÇÃO DE FUNDO
+   ============================================================ */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, Helvetica, sans-serif;
+
+    background: url('https://images.unsplash.com/photo-1512820790803-83ca734da794')
+                no-repeat center center fixed;
+    background-size: cover;
+
+    backdrop-filter: blur(4px);
+    color: #fff;
+}
+
+/* ============================================================
+   TÍTULOS PRINCIPAIS
+   ============================================================ */
+h1, h2 {
+    text-align: center;
+    margin-top: 20px;
+    text-shadow: 2px 2px 5px #000;
+}
+
+/* ============================================================
+   FORMULÁRIOS
+   ============================================================ */
+form {
+    width: 80%;
+    max-width: 550px;
+    margin: 30px auto;
+
+    background: rgba(0, 0, 0, 0.55);
+    padding: 20px;
+    border-radius: 10px;
+
+    box-shadow: 0 0 12px rgba(0, 0, 0, 0.6);
+}
+
+/* Campos de entrada */
+form input,
+form select {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 12px;
+
+    border: none;
+    border-radius: 5px;
+}
+
+/* Botões */
+button,
+input[type="submit"] {
+    width: 100%;
+    padding: 10px;
+
+    background-color: #ffcc00;
+    color: #000;
+
+    font-weight: bold;
+    cursor: pointer;
+
+    border: none;
+    border-radius: 6px;
+
+    transition: background-color 0.3s ease;
+}
+
+button:hover,
+input[type="submit"]:hover {
+    background-color: #ffdd44;
+}
+
+/* Botões dentro da tabela (Editar/Deletar) */
+td form input[type="submit"] {
+    width: auto;
+    padding: 6px 10px;
+    margin: 3px;
+}
+
+/* ============================================================
+   TABELA DE ACERVO
+   ============================================================ */
+table {
+    width: 90%;
+    max-width: 900px;
+    margin: 40px auto;
+
+    border-collapse: collapse;
+
+    background: rgba(0, 0, 0, 0.65);
+    color: #fff;
+
+    box-shadow: 0 0 12px rgba(0, 0, 0, 0.5);
+}
+
+th, td {
+    padding: 12px;
+    border: 1px solid #fff;
+    text-align: center;
+}
+
+th {
+    background: #222;
+    font-size: 18px;
+}
+
+/* ============================================================
+   ANIMAÇÃO DO SVG (EFEITO DE ROTAÇÃO)
+   ============================================================ */
+svg {
+    position: fixed;
+    animation: rotate 1s linear infinite;
+    animation-play-state: paused;
+    animation-delay: calc(var(--scroll) * -1s);
+}
+
+/* Keyframe da rotação */
+@keyframes rotate {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+}
+
+/* ============================================================
+   RESPONSIVIDADE
+   ============================================================ */
+@media (max-width: 768px) {
+    form,
+    table {
+        width: 95%;
+    }
+
+    svg {
+        width: 60px;
+        height: 60px;
+    }
+}
