@@ -1,0 +1,241 @@
+<?php
+session_start();
+include('../config/database.php');
+
+$database = new Database();
+$db = $database->getConnection();
+
+$id = $_GET['id'] ?? null;
+$peca = null;
+
+if ($id) {
+    $query = "SELECT p.*, e.Quantidade, e.Quantidade_Minima, e.Localizacao, e.ID_Estoque
+              FROM Peca p 
+              INNER JOIN Estoque e ON p.ID_Peca = e.ID_Peca 
+              WHERE p.ID_Peca = :id";
+    $stmt = $db->prepare($query);
+    $stmt->bindParam(":id", $id);
+    $stmt->execute();
+    $peca = $stmt->fetch(PDO::FETCH_ASSOC);
+}
+
+if ($_POST) {
+    try {
+        $nome = $_POST['nome'];
+        $descricao = $_POST['descricao'];
+        $preco_custo = $_POST['preco_custo'];
+        $preco_venda = $_POST['preco_venda'];
+        $quantidade = $_POST['quantidade'];
+        $quantidade_minima = $_POST['quantidade_minima'];
+        $localizacao = $_POST['localizacao'];
+        
+        // Iniciar transação
+        $db->beginTransaction();
+        
+        // Atualizar tabela Peca
+        $query_peca = "UPDATE Peca SET Nome=:nome, Descricao=:descricao, Preco_Custo=:preco_custo, Preco_Venda=:preco_venda WHERE ID_Peca=:id";
+        $stmt_peca = $db->prepare($query_peca);
+        
+        $stmt_peca->bindParam(":id", $id);
+        $stmt_peca->bindParam(":nome", $nome);
+        $stmt_peca->bindParam(":descricao", $descricao);
+        $stmt_peca->bindParam(":preco_custo", $preco_custo);
+        $stmt_peca->bindParam(":preco_venda", $preco_venda);
+        
+        if ($stmt_peca->execute()) {
+            // Atualizar tabela Estoque
+            $query_estoque = "UPDATE Estoque SET Quantidade=:quantidade, Quantidade_Minima=:quantidade_minima, Localizacao=:localizacao WHERE ID_Peca=:id";
+            $stmt_estoque = $db->prepare($query_estoque);
+            
+            $stmt_estoque->bindParam(":id", $id);
+            $stmt_estoque->bindParam(":quantidade", $quantidade);
+            $stmt_estoque->bindParam(":quantidade_minima", $quantidade_minima);
+            $stmt_estoque->bindParam(":localizacao", $localizacao);
+            
+            if ($stmt_estoque->execute()) {
+                $db->commit();
+                $_SESSION['success_message'] = "✅ Peça atualizada com sucesso!";
+                header("Location: listar.php");
+                exit();
+            }
+        }
+        
+        // Se algo der errado, faz rollback
+        $db->rollBack();
+        $_SESSION['error_message'] = "Erro ao atualizar peça.";
+        
+    } catch(PDOException $exception) {
+        if (isset($db)) {
+            $db->rollBack();
+        }
+        $_SESSION['error_message'] = "Erro ao atualizar peça: " . $exception->getMessage();
+    }
+}
+?>
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Editar Peça</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .form-section {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            border-radius: 8px;
+            border-left: 4px solid #3498db;
+        }
+        .price-comparison {
+            display: flex;
+            gap: 1rem;
+        }
+        .price-comparison .form-group {
+            flex: 1;
+        }
+        .readonly-field {
+            background-color: #f8f9fa;
+            color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>✏️ Editar Peça</h1>
+            <a href="listar.php" class="btn btn-secondary">⬅️ Voltar</a>
+        </header>
+
+        <?php
+        if (isset($_SESSION['error_message'])) {
+            echo '<div class="alert alert-error">' . $_SESSION['error_message'] . '</div>';
+            unset($_SESSION['error_message']);
+        }
+        ?>
+
+        <?php if ($peca): ?>
+        <form method="POST">
+            <!-- Seção: Informações da Peça -->
+            <div class="form-section">
+                <h3>🔧 Informações da Peça</h3>
+                
+                <div class="form-group">
+                    <label for="id_peca">Código da Peça:</label>
+                    <input type="text" id="id_peca" name="id_peca" value="<?php echo $peca['ID_Peca']; ?>" 
+                           class="readonly-field" readonly>
+                    <small style="color: #666;">Código não pode ser alterado</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="nome">Nome da Peça:</label>
+                    <input type="text" id="nome" name="nome" value="<?php echo $peca['Nome']; ?>" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="descricao">Descrição:</label>
+                    <textarea id="descricao" name="descricao" rows="3"><?php echo $peca['Descricao']; ?></textarea>
+                </div>
+                
+                <div class="price-comparison">
+                    <div class="form-group">
+                        <label for="preco_custo">Preço de Custo (R$):</label>
+                        <input type="number" id="preco_custo" name="preco_custo" step="0.01" min="0" 
+                               value="<?php echo $peca['Preco_Custo']; ?>" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="preco_venda">Preço de Venda (R$):</label>
+                        <input type="number" id="preco_venda" name="preco_venda" step="0.01" min="0" 
+                               value="<?php echo $peca['Preco_Venda']; ?>" required>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Seção: Controle de Estoque -->
+            <div class="form-section">
+                <h3>📊 Controle de Estoque</h3>
+                
+                <div class="form-group">
+                    <label for="quantidade">Quantidade em Estoque:</label>
+                    <input type="number" id="quantidade" name="quantidade" min="0" max="999" 
+                           value="<?php echo $peca['Quantidade']; ?>" required>
+                    <small style="color: #666;">Máximo: 999 unidades</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="quantidade_minima">Quantidade Mínima:</label>
+                    <input type="number" id="quantidade_minima" name="quantidade_minima" min="1" max="999" 
+                           value="<?php echo $peca['Quantidade_Minima']; ?>" required>
+                    <small style="color: #666;">Sistema alertará quando estoque chegar neste nível</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="localizacao">Localização:</label>
+                    <input type="text" id="localizacao" name="localizacao" 
+                           value="<?php echo $peca['Localizacao']; ?>" 
+                           placeholder="Ex: Prateleira A1, Caixa B2">
+                </div>
+            </div>
+            
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">💾 Atualizar Peça</button>
+                <a href="listar.php" class="btn btn-secondary">❌ Cancelar</a>
+            </div>
+        </form>
+
+        <!-- Mostrar cálculo de lucro atual -->
+        <div class="form-section">
+            <h3>💰 Cálculo de Lucro Atual</h3>
+            <?php
+            $lucro = $peca['Preco_Venda'] - $peca['Preco_Custo'];
+            $margem = ($lucro / $peca['Preco_Custo']) * 100;
+            $classe_lucro = $lucro >= 0 ? 'lucro' : 'prejuizo';
+            ?>
+            <p><strong>Lucro por unidade:</strong> 
+                <span class="<?php echo $classe_lucro; ?>">
+                    R$ <?php echo number_format($lucro, 2, ',', '.'); ?>
+                    (<?php echo number_format($margem, 1, ',', '.'); ?>%)
+                </span>
+            </p>
+            <p><strong>Lucro total em estoque:</strong> 
+                <span class="<?php echo $classe_lucro; ?>">
+                    R$ <?php echo number_format($lucro * $peca['Quantidade'], 2, ',', '.'); ?>
+                </span>
+            </p>
+        </div>
+
+        <?php else: ?>
+            <div class="alert alert-error">
+                <p>Peça não encontrada.</p>
+                <a href="listar.php" class="btn btn-secondary">Voltar para a lista</a>
+            </div>
+        <?php endif; ?>
+    </div>
+
+    <script>
+        // Calcular margem de lucro em tempo real
+        const precoCusto = document.getElementById('preco_custo');
+        const precoVenda = document.getElementById('preco_venda');
+        
+        function calcularMargem() {
+            if (precoCusto.value && precoVenda.value) {
+                const custo = parseFloat(precoCusto.value);
+                const venda = parseFloat(precoVenda.value);
+                
+                if (venda < custo) {
+                    precoVenda.style.borderColor = '#e74c3c';
+                } else {
+                    precoVenda.style.borderColor = '#27ae60';
+                }
+            }
+        }
+        
+        precoCusto.addEventListener('input', calcularMargem);
+        precoVenda.addEventListener('input', calcularMargem);
+        
+        // Calcular margem inicial
+        calcularMargem();
+    </script>
+</body>
+</html>

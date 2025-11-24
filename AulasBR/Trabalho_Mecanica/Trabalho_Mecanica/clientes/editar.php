@@ -19,24 +19,35 @@ if ($id) {
 
 if ($_POST) {
     try {
-        $query = "UPDATE Cliente SET Nome=:nome, CPF=:cpf, Telefone=:telefone, Email=:email WHERE ID_Cliente=:id";
-        $stmt = $db->prepare($query);
-        
         $nome = $_POST['nome'];
         $cpf = $_POST['cpf'];
         $telefone = $_POST['telefone'];
         $email = $_POST['email'];
         
-        $stmt->bindParam(":id", $id);
-        $stmt->bindParam(":nome", $nome);
-        $stmt->bindParam(":cpf", $cpf);
-        $stmt->bindParam(":telefone", $telefone);
-        $stmt->bindParam(":email", $email);
+        // VERIFICAR SE CPF JÁ EXISTE (excluindo o próprio cliente)
+        $query_verifica = "SELECT ID_Cliente FROM Cliente WHERE CPF = :cpf AND ID_Cliente != :id";
+        $stmt_verifica = $db->prepare($query_verifica);
+        $stmt_verifica->bindParam(":cpf", $cpf);
+        $stmt_verifica->bindParam(":id", $id);
+        $stmt_verifica->execute();
         
-        if ($stmt->execute()) {
-            $_SESSION['success_message'] = "Cliente atualizado com sucesso!";
-            header("Location: listar.php");
-            exit();
+        if ($stmt_verifica->rowCount() > 0) {
+            $_SESSION['error_message'] = "❌ CPF já cadastrado para outro cliente!";
+        } else {
+            $query = "UPDATE Cliente SET Nome=:nome, CPF=:cpf, Telefone=:telefone, Email=:email WHERE ID_Cliente=:id";
+            $stmt = $db->prepare($query);
+            
+            $stmt->bindParam(":id", $id);
+            $stmt->bindParam(":nome", $nome);
+            $stmt->bindParam(":cpf", $cpf);
+            $stmt->bindParam(":telefone", $telefone);
+            $stmt->bindParam(":email", $email);
+            
+            if ($stmt->execute()) {
+                $_SESSION['success_message'] = "✅ Cliente atualizado com sucesso!";
+                header("Location: listar.php");
+                exit();
+            }
         }
     } catch(PDOException $exception) {
         $_SESSION['error_message'] = "Erro ao atualizar cliente: " . $exception->getMessage();
@@ -54,8 +65,8 @@ if ($_POST) {
 <body>
     <div class="container">
         <header>
-            <h1>Editar Cliente</h1>
-            <a href="listar.php" class="btn btn-secondary">Voltar</a>
+            <h1>👥 Editar Cliente</h1>
+            <a href="listar.php" class="btn btn-secondary">⬅️ Voltar</a>
         </header>
 
         <?php
@@ -74,7 +85,7 @@ if ($_POST) {
             
             <div class="form-group">
                 <label for="cpf">CPF:</label>
-                <input type="text" id="cpf" name="cpf" value="<?php echo $cliente['CPF']; ?>" required>
+                <input type="text" id="cpf" name="cpf" value="<?php echo $cliente['CPF']; ?>" required maxlength="11">
             </div>
             
             <div class="form-group">
@@ -87,7 +98,7 @@ if ($_POST) {
                 <input type="email" id="email" name="email" value="<?php echo $cliente['Email']; ?>">
             </div>
             
-            <button type="submit" class="btn btn-primary">Atualizar</button>
+            <button type="submit" class="btn btn-primary">💾 Atualizar</button>
         </form>
         <?php else: ?>
             <div class="alert alert-error">Cliente não encontrado.</div>

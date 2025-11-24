@@ -7,23 +7,35 @@ if ($_POST) {
         $database = new Database();
         $db = $database->getConnection();
         
-        $query = "INSERT INTO Cliente SET Nome=:nome, CPF=:cpf, Telefone=:telefone, Email=:email";
-        $stmt = $db->prepare($query);
-        
-        $nome = $_POST['nome'];
         $cpf = $_POST['cpf'];
+        $nome = $_POST['nome'];
         $telefone = $_POST['telefone'];
         $email = $_POST['email'];
         
-        $stmt->bindParam(":nome", $nome);
-        $stmt->bindParam(":cpf", $cpf);
-        $stmt->bindParam(":telefone", $telefone);
-        $stmt->bindParam(":email", $email);
+        // 1. VERIFICAR SE CPF JÁ EXISTE
+        $query_verifica = "SELECT ID_Cliente FROM Cliente WHERE CPF = :cpf";
+        $stmt_verifica = $db->prepare($query_verifica);
+        $stmt_verifica->bindParam(":cpf", $cpf);
+        $stmt_verifica->execute();
         
-        if ($stmt->execute()) {
-            $_SESSION['success_message'] = "Cliente cadastrado com sucesso!";
-            header("Location: listar.php");
-            exit();
+        if ($stmt_verifica->rowCount() > 0) {
+            // CPF já cadastrado
+            $_SESSION['error_message'] = "❌ CPF já cadastrado no sistema!";
+        } else {
+            // CPF não existe, pode cadastrar
+            $query = "INSERT INTO Cliente SET Nome=:nome, CPF=:cpf, Telefone=:telefone, Email=:email";
+            $stmt = $db->prepare($query);
+            
+            $stmt->bindParam(":nome", $nome);
+            $stmt->bindParam(":cpf", $cpf);
+            $stmt->bindParam(":telefone", $telefone);
+            $stmt->bindParam(":email", $email);
+            
+            if ($stmt->execute()) {
+                $_SESSION['success_message'] = "✅ Cliente cadastrado com sucesso!";
+                header("Location: listar.php");
+                exit();
+            }
         }
     } catch(PDOException $exception) {
         $_SESSION['error_message'] = "Erro ao cadastrar cliente: " . $exception->getMessage();
@@ -37,6 +49,20 @@ if ($_POST) {
     <meta charset="UTF-8">
     <title>Cadastrar Cliente</title>
     <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .cpf-error {
+            color: #e74c3c;
+            font-size: 0.9rem;
+            margin-top: 5px;
+            display: none;
+        }
+        .cpf-success {
+            color: #27ae60;
+            font-size: 0.9rem;
+            margin-top: 5px;
+            display: none;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -52,7 +78,7 @@ if ($_POST) {
         }
         ?>
 
-        <form method="POST" class="form-container">
+        <form method="POST" id="formCliente">
             <div class="form-group">
                 <label for="nome">Nome Completo:</label>
                 <input type="text" id="nome" name="nome" required placeholder="Digite o nome completo">
@@ -60,7 +86,8 @@ if ($_POST) {
             
             <div class="form-group">
                 <label for="cpf">CPF:</label>
-                <input type="text" id="cpf" name="cpf" required placeholder="Digite o CPF (apenas números)" maxlength="11">
+                <input type="text" id="cpf" name="cpf" required placeholder="Digite o CPF (apenas números)" maxlength="11" onblur="verificarCPF(this.value)">
+                <div id="cpfMessage" class="cpf-error"></div>
             </div>
             
             <div class="form-group">
@@ -74,7 +101,7 @@ if ($_POST) {
             </div>
             
             <div class="form-actions">
-                <button type="submit" class="btn btn-primary">💾 Cadastrar Cliente</button>
+                <button type="submit" id="btnSubmit" class="btn btn-primary">💾 Cadastrar Cliente</button>
                 <a href="listar.php" class="btn btn-secondary">❌ Cancelar</a>
             </div>
         </form>
@@ -97,6 +124,49 @@ if ($_POST) {
                     value = value.replace(/(\d{2})(\d{4})(\d{4})/, '($1) $2-$3');
                 }
                 e.target.value = value;
+            }
+        });
+
+        // Função para verificar CPF via AJAX (opcional - verificação em tempo real)
+        function verificarCPF(cpf) {
+            if (cpf.length === 11) {
+                const cpfMessage = document.getElementById('cpfMessage');
+                const btnSubmit = document.getElementById('btnSubmit');
+                
+                // Mostrar carregamento
+                cpfMessage.innerHTML = '🔍 Verificando CPF...';
+                cpfMessage.className = 'cpf-error';
+                cpfMessage.style.display = 'block';
+                
+                // Fazer requisição AJAX para verificar CPF
+                fetch('verificar_cpf.php?cpf=' + cpf)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.existe) {
+                            cpfMessage.innerHTML = '❌ CPF já cadastrado no sistema!';
+                            cpfMessage.className = 'cpf-error';
+                            btnSubmit.disabled = true;
+                        } else {
+                            cpfMessage.innerHTML = '✅ CPF disponível para cadastro';
+                            cpfMessage.className = 'cpf-success';
+                            btnSubmit.disabled = false;
+                        }
+                    })
+                    .catch(error => {
+                        cpfMessage.innerHTML = '⚠️ Erro ao verificar CPF';
+                        cpfMessage.className = 'cpf-error';
+                        btnSubmit.disabled = false;
+                    });
+            }
+        }
+
+        // Validação do formulário
+        document.getElementById('formCliente').addEventListener('submit', function(e) {
+            const cpf = document.getElementById('cpf').value;
+            if (cpf.length !== 11) {
+                e.preventDefault();
+                alert('CPF deve ter 11 dígitos!');
+                return false;
             }
         });
     </script>

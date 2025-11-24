@@ -7,14 +7,16 @@ if ($_POST) {
         $database = new Database();
         $db = $database->getConnection();
         
-        $query = "INSERT INTO Veiculo SET Placa=:placa, Modelo=:modelo, Ano=:ano";
+        $query = "INSERT INTO Veiculo SET Placa=:placa, Marca=:marca, Modelo=:modelo, Ano=:ano";
         $stmt = $db->prepare($query);
         
         $placa = $_POST['placa'];
+        $marca = $_POST['marca'];
         $modelo = $_POST['modelo'];
         $ano = $_POST['ano'];
         
         $stmt->bindParam(":placa", $placa);
+        $stmt->bindParam(":marca", $marca);
         $stmt->bindParam(":modelo", $modelo);
         $stmt->bindParam(":ano", $ano);
         
@@ -39,8 +41,8 @@ if ($_POST) {
 <body>
     <div class="container">
         <header>
-            <h1>Cadastrar Veículo</h1>
-            <a href="listar.php" class="btn btn-secondary">Voltar</a>
+            <h1>🚗 Cadastrar Veículo</h1>
+            <a href="listar.php" class="btn btn-secondary">⬅️ Voltar</a>
         </header>
 
         <?php
@@ -53,20 +55,25 @@ if ($_POST) {
         <form method="POST">
             <div class="form-group">
                 <label for="placa">Placa:</label>
-                <input type="text" id="placa" name="placa" required maxlength="7">
+                <input type="text" id="placa" name="placa" required maxlength="7" placeholder="ABC1D23">
+            </div>
+            
+            <div class="form-group">
+                <label for="marca">Marca:</label>
+                <input type="text" id="marca" name="marca" required placeholder="Ex: Volkswagen, Ford, Chevrolet">
             </div>
             
             <div class="form-group">
                 <label for="modelo">Modelo:</label>
-                <input type="text" id="modelo" name="modelo" required>
+                <input type="text" id="modelo" name="modelo" required placeholder="Ex: Gol, Fiesta, Onix">
             </div>
             
             <div class="form-group">
                 <label for="ano">Ano:</label>
-                <input type="number" id="ano" name="ano" required min="1900" max="2030">
+                <input type="number" id="ano" name="ano" required min="1900" max="2030" placeholder="2023">
             </div>
             
-            <button type="submit" class="btn btn-primary">Cadastrar</button>
+            <button type="submit" class="btn btn-primary">💾 Cadastrar Veículo</button>
         </form>
     </div>
 </body>

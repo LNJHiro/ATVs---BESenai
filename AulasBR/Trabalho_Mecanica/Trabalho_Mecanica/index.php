@@ -23,18 +23,19 @@ session_start();
                 <li><a href="veiculos/listar.php">🚗 Veículos</a></li>
                 <li><a href="mecanicos/listar.php">🔧 Mecânicos</a></li>
                 <li><a href="ordens-service/listar.php">📋 Ordens de Serviço</a></li>
+                <li><a href="estoque/listar.php">📦 Estoque</a></li>
             </ul>
         </nav>
         
         <main>
             <div class="welcome">
-                <h2>Bem-vindo ao Sistema da Oficina!</h2>
-                <p>Gerencie clientes, veículos, mecânicos e ordens de serviço de forma simples e eficiente.</p>
+                <h2>Bem-vindo ao Sistema da Oficina</h2>
+                <p>[Gráfico de lucro/vendas será adicionado futuramente]</p>
                 
                 <div class="stats">
                     <div class="stat-card">
                         <h3>📊 Estatísticas Rápidas</h3>
-                        <p>Use o menu acima para acessar as funcionalidades do sistema.</p>
+                        <p>Use o menu acima para acessar todas as funcionalidades do sistema.</p>
                     </div>
                 </div>
 
@@ -45,6 +46,7 @@ session_start();
                         <a href="veiculos/cadastrar.php" class="btn btn-primary">Novo Veículo</a>
                         <a href="mecanicos/cadastrar.php" class="btn btn-primary">Novo Mecânico</a>
                         <a href="ordens-service/cadastrar.php" class="btn btn-primary">Nova OS</a>
+                        <a href="estoque/cadastrar.php" class="btn btn-primary">Nova Peça</a>
                     </div>
                 </div>
             </div>
