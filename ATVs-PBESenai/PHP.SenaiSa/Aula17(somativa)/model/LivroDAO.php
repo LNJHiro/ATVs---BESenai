@@ -15,7 +15,7 @@ class LivroDAO {
                 titulo VARCHAR(100) NOT NULL UNIQUE,
                 genero_literario VARCHAR(50) NOT NULL,
                 autor VARCHAR(20) NOT NULL,
-                ano_publicacao DECIMAL(10,2) NOT NULL,
+                ano_publicacao INT NOT NULL,
                 qtde INT NOT NULL
             )
         ");

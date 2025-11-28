@@ -9,8 +9,9 @@ $termoBusca = $_POST['termo_busca'] ?? '';
 // --- Processamento das ações ---
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-    // CRIAR novo livro
-    if ($acao === 'criar') {
+// CRIAR novo livro
+if ($acao === 'criar') {
+    try {
         $controller->criar(
             trim($_POST['titulo']),
             trim($_POST['genero_literario']),
@@ -20,7 +21,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         );
         header('Location: ' . $_SERVER['REQUEST_URI']);
         exit;
+    } catch (Exception $e) {
+        $mensagemErro = $e->getMessage();
     }
+}
 
     // DELETAR livro existente
     if ($acao === 'deletar') {
@@ -58,6 +62,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 // LER livros cadastrados (apenas se não estiver em modo de busca)
 if (!isset($modoBusca)) {
     $lista = $controller->ler();
+    $mensagemErro = '';
 }
 ?>
 
@@ -90,6 +95,22 @@ if (!isset($modoBusca)) {
                 <?php endif; ?>
             </form>
         </div>
+        
+    <?php if (!empty($mensagemErro)): ?>
+    <div class="mensagem-erro" style="
+        background: #f8d7da;
+        color: #721c24;
+        padding: 15px;
+        border-radius: 5px;
+        margin: 20px auto;
+        max-width: 550px;
+        border: 1px solid #f5c6cb;
+        text-align: center;
+        font-weight: bold;
+    ">
+        ⚠️ <?= htmlspecialchars($mensagemErro) ?>
+    </div>
+<?php endif; ?>
 
 
         <?php if ($editarLivro): ?>
