@@ -4,6 +4,7 @@ require_once __DIR__ . '/../controller/LivroController.php';
 $controller = new LivroController();
 $acao = $_POST['acao'] ?? '';
 $editarLivro = null;
+$termoBusca = $_POST['termo_busca'] ?? '';
 
 // --- Processamento das ações ---
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -46,10 +47,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         header('Location: ' . $_SERVER['REQUEST_URI']);
         exit;
     }
+
+    // BUSCAR LIVROS
+    if ($acao === 'buscar') {
+        $lista = $controller->buscar(trim($termoBusca));
+        $modoBusca = true;
+    }
 }
 
-// LER livros cadastrados
-$lista = $controller->ler();
+// LER livros cadastrados (apenas se não estiver em modo de busca)
+if (!isset($modoBusca)) {
+    $lista = $controller->ler();
+}
 ?>
 
 <!DOCTYPE html>
@@ -58,240 +67,6 @@ $lista = $controller->ler();
     <meta charset="UTF-8">
     <title>Biblioteca Irmã Maria de Santo Inocêncio Lima - Gerenciamento de Livros</title>
     <link rel="stylesheet" href="style.css">
-    <style>
-        /* Reset e configurações gerais */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        body {
-            background-color: #f5f5f5;
-            color: #333;
-            line-height: 1.6;
-            background-image: url('https://images.unsplash.com/photo-1507842217343-583bb7270b66?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
-            background-size: cover;
-            background-attachment: fixed;
-            background-position: center;
-            position: relative;
-        }
-
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(255, 255, 255, 0.85);
-            z-index: -1;
-        }
-
-        /* Container principal */
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        /* Cabeçalho */
-        header {
-            text-align: center;
-            padding: 30px 0;
-            background: linear-gradient(135deg, #2c3e50, #4a6491);
-            color: white;
-            border-radius: 10px;
-            margin-bottom: 30px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            position: relative;
-            overflow: hidden;
-        }
-
-        header::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M0,0 L100,0 L100,100 Z" fill="rgba(255,255,255,0.1)"/></svg>');
-            background-size: cover;
-        }
-
-        h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-            font-weight: 300;
-            letter-spacing: 1px;
-        }
-
-        h2 {
-            font-size: 1.8rem;
-            font-weight: 400;
-            margin-bottom: 5px;
-        }
-
-        /* Formulários */
-        .form-container {
-            background-color: white;
-            padding: 25px;
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
-            margin-bottom: 30px;
-            transition: transform 0.3s ease;
-        }
-
-        .form-container:hover {
-            transform: translateY(-5px);
-        }
-
-        form {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            align-items: end;
-        }
-
-        input, select, button {
-            padding: 12px 15px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-        }
-
-        input:focus, select:focus {
-            outline: none;
-            border-color: #4a6491;
-            box-shadow: 0 0 0 2px rgba(74, 100, 145, 0.2);
-        }
-
-        button {
-            background: linear-gradient(to right, #4a6491, #2c3e50);
-            color: white;
-            border: none;
-            cursor: pointer;
-            font-weight: 500;
-            letter-spacing: 0.5px;
-        }
-
-        button:hover {
-            background: linear-gradient(to right, #3a5479, #1c2a3a);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        /* Tabela */
-        .table-container {
-            background-color: white;
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
-            margin-top: 20px;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        th {
-            background: linear-gradient(135deg, #4a6491, #2c3e50);
-            color: white;
-            padding: 15px;
-            text-align: left;
-            font-weight: 500;
-        }
-
-        td {
-            padding: 12px 15px;
-            border-bottom: 1px solid #eee;
-        }
-
-        tr:nth-child(even) {
-            background-color: #f9f9f9;
-        }
-
-        tr:hover {
-            background-color: #f0f4f8;
-        }
-
-        /* Botões de ação na tabela */
-        .action-buttons {
-            display: flex;
-            gap: 8px;
-        }
-
-        .action-buttons form {
-            display: inline;
-        }
-
-        .btn-edit {
-            background: linear-gradient(to right, #3498db, #2980b9);
-            padding: 8px 15px;
-            font-size: 0.9rem;
-        }
-
-        .btn-delete {
-            background: linear-gradient(to right, #e74c3c, #c0392b);
-            padding: 8px 15px;
-            font-size: 0.9rem;
-        }
-
-        .btn-edit:hover {
-            background: linear-gradient(to right, #2980b9, #21618c);
-        }
-
-        .btn-delete:hover {
-            background: linear-gradient(to right, #c0392b, #a93226);
-        }
-
-        /* Mensagens e estados */
-        .empty-message {
-            text-align: center;
-            padding: 20px;
-            color: #7f8c8d;
-            font-style: italic;
-        }
-
-        hr {
-            border: none;
-            height: 1px;
-            background: linear-gradient(to right, transparent, #ddd, transparent);
-            margin: 25px 0;
-        }
-
-        /* Responsividade */
-        @media (max-width: 768px) {
-            form {
-                grid-template-columns: 1fr;
-            }
-            
-            .action-buttons {
-                flex-direction: column;
-            }
-            
-            h1 {
-                font-size: 2rem;
-            }
-            
-            h2 {
-                font-size: 1.5rem;
-            }
-        }
-
-        /* Animações */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .form-container, .table-container {
-            animation: fadeIn 0.5s ease-out;
-        }
-    </style>
 </head>
 <body>
     <div class="container">
@@ -301,6 +76,21 @@ $lista = $controller->ler();
         </header>
 
         <hr>
+                <!-- FORMULÁRIO DE BUSCA -->
+        <div class="search-container">
+            <form method="POST" class="search-form">
+                <input type="hidden" name="acao" value="buscar">
+                <input type="text" name="termo_busca" placeholder="Buscar por título, autor ou gênero..." 
+                       value="<?= htmlspecialchars($termoBusca) ?>" required>
+                <button type="submit">🔍 Buscar</button>
+                <?php if (!empty($termoBusca)): ?>
+                    <a href="<?= $_SERVER['PHP_SELF'] ?>" class="btn-clear" style="text-decoration: none;">
+                        <button type="button">Limpar Busca</button>
+                    </a>
+                <?php endif; ?>
+            </form>
+        </div>
+
 
         <?php if ($editarLivro): ?>
             <!-- Formulário de atualização -->
@@ -324,6 +114,8 @@ $lista = $controller->ler();
                         <option value="Drama" <?= $editarLivro->getGeneroLiterario() === 'Drama' ? 'selected' : '' ?>>Drama</option>
                         <option value="Infantil" <?= $editarLivro->getGeneroLiterario() === 'Infantil' ? 'selected' : '' ?>>Infantil</option>
                         <option value="Didático" <?= $editarLivro->getGeneroLiterario() === 'Didático' ? 'selected' : '' ?>>Didático</option>
+                        <option value="Literatura Brasileira" <?= $editarLivro->getGeneroLiterario() === 'Literatura Brasileira' ? 'selected' : '' ?>>Literatura Brasileira</option>
+
                     </select>
 
                     <input type="text" name="autor" placeholder="Autor do livro:" required value="<?= htmlspecialchars($editarLivro->getAutor()) ?>">
@@ -353,6 +145,7 @@ $lista = $controller->ler();
                         <option value="Drama">Drama</option>
                         <option value="Infantil">Infantil</option>
                         <option value="Didático">Didático</option>
+                        <option value="Lieteratura Brasileira ">Lieteratura Brasileira </option>
                     </select>
                     <input type="text" name="autor" placeholder="Autor do livro:" required>
                     <input type="number" name="ano_publicacao" min="1000" max="<?= date('Y') ?>" placeholder="Ano de Publicação:" required>
@@ -364,7 +157,20 @@ $lista = $controller->ler();
 
         <hr>
 
-        <h2>Acervo de Livros</h2>
+        <h2>
+            <?php if (!empty($termoBusca)): ?>
+                Resultados da busca por "<?= htmlspecialchars($termoBusca) ?>"
+            <?php else: ?>
+                Acervo de Livros
+            <?php endif; ?>
+        </h2>
+
+        <?php if (!empty($termoBusca)): ?>
+            <div class="search-info">
+                <?= count($lista) ?> livro(s) encontrado(s)
+                | <a href="<?= $_SERVER['PHP_SELF'] ?>" style="color: #4a6491;">Ver todos os livros</a>
+            </div>
+        <?php endif; ?>
 
         <div class="table-container">
             <table>
@@ -405,7 +211,15 @@ $lista = $controller->ler();
                         </tr>
                     <?php endforeach; ?>
                 <?php else: ?>
-                    <tr><td colspan="6" class="empty-message">Nenhum livro cadastrado.</td></tr>
+                    <tr>
+                        <td colspan="6" class="empty-message">
+                            <?php if (!empty($termoBusca)): ?>
+                                Nenhum livro encontrado para "<?= htmlspecialchars($termoBusca) ?>"
+                            <?php else: ?>
+                                Nenhum livro cadastrado.
+                            <?php endif; ?>
+                        </td>
+                    </tr>
                 <?php endif; ?>
             </table>
         </div>

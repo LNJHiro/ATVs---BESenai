@@ -92,4 +92,26 @@ class LivroDAO {
         }
         return null;
     }
+    public function buscarLivros($termo) {
+    $stmt = $this->conn->prepare("
+        SELECT * FROM livros 
+        WHERE titulo LIKE :termo 
+           OR autor LIKE :termo 
+           OR genero_literario LIKE :termo
+        ORDER BY titulo
+    ");
+    $stmt->execute([':termo' => '%' . $termo . '%']);
+    
+    $result = [];
+    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        $result[] = new Livro(
+            $row['titulo'],
+            $row['genero_literario'],
+            $row['autor'],
+            $row['ano_publicacao'],
+            $row['qtde']
+        );
+    }
+    return $result;
+}
 }

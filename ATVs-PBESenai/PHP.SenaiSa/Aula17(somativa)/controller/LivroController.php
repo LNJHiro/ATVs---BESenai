@@ -13,7 +13,7 @@ class LivroController {
     // Lista todas as livros
     public function criar($titulo, $genero_literario, $autor, $ano_publicacao, $qtde) {
 
-        // // Gera ID automaticamente com base no timestamp (exemplo simples)
+        // // Gera ID automaticamente
         // $id = time(); // Função caso o objeto tenha um atributo de ID
 
         $livro = new Livro( $titulo, $genero_literario, $autor, $ano_publicacao, $qtde);
@@ -35,5 +35,9 @@ public function buscarPorTitulo($titulo) {
     public function deletar($titulo) {
         $this->dao->excluirLivro($titulo);
     }
+// Buscar livros por termo
+public function buscar($termo) {
+    return $this->dao->buscarLivros($termo);
+}
 }
 
