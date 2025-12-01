@@ -149,7 +149,7 @@ ADD FOREIGN KEY (ID_Cliente) REFERENCES Cliente(ID_Cliente),
 ADD FOREIGN KEY (ID_Veiculo) REFERENCES Veiculo(ID_Veiculo);
 
 ALTER TABLE Veiculo 
-ADD COLUMN IF NOT EXISTS Marca VARCHAR(50) AFTER Modelo;
+ADD COLUMN Marca VARCHAR(50) AFTER Modelo;
 
 -- Adicionar campos faltantes na tabela Peca
 ALTER TABLE Peca 
@@ -211,3 +211,4 @@ INSERT INTO OS (
 ('2025-01-05', '2025-01-07', 'Revisão geral', 'Concluído', 2, 'FILTRO-001, VELA-001', 450.00, 2, 2),
 ('2025-01-12', NULL, 'Freio fazendo ruído', 'Em andamento', 3, 'PAST-001', 220.00, 3, 3);
 
+DROP DATABASE Oficina;
